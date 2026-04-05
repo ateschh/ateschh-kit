@@ -107,13 +107,14 @@ ateschh-kit/
 ├── .claude/
 │   ├── rules/             ← 7 otomatik yüklenen davranış kuralı
 │   └── commands/          ← Slash komutları (Claude Code native)
-├── workflows/             ← Slash komutları (Antigravity)
+├── .agent/
+│   └── workflows/         ← Slash komutları (Antigravity native)
 ├── agents/                ← 9 uzman ajan
 ├── skills/                ← 9 yeniden kullanılabilir atomik yetenek
 └── templates/             ← Proje dosyası şablonları
 ```
 
-> `.claude/commands/` ve `workflows/` birebir aynı dosyaları içerir — her platform için biri.
+> `.claude/commands/` ve `.agent/workflows/` birebir aynı dosyaları içerir — her platform için biri.
 
 ---
 
@@ -122,7 +123,7 @@ ateschh-kit/
 | Platform | Slash Komutları | Durum |
 |----------|----------------|-------|
 | Claude Code | `.claude/commands/` | ✅ Tam destek |
-| Antigravity | `workflows/` | ✅ Tam destek |
+| Antigravity | `.agent/workflows/` | ✅ Tam destek |
 | Cursor | CLAUDE.md üzerinden | ✅ Çalışır |
 | Windsurf | CLAUDE.md üzerinden | ✅ Çalışır |
 

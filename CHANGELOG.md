@@ -142,6 +142,16 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.7] — 2026-04-06
+
+### Changed
+
+- Antigravity slash commands moved from `workflows/` → `.agent/workflows/` (correct native location)
+- `workflows/` root directory removed
+- `bin/install.js` now copies `.agent/` instead of `workflows/`
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`

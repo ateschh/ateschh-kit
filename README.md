@@ -107,13 +107,14 @@ ateschh-kit/
 ├── .claude/
 │   ├── rules/             ← 7 auto-loaded behavioral rules
 │   └── commands/          ← Slash commands (Claude Code native)
-├── workflows/             ← Slash commands (Antigravity)
+├── .agent/
+│   └── workflows/         ← Slash commands (Antigravity native)
 ├── agents/                ← 9 specialist agents
 ├── skills/                ← 9 reusable atomic skills
 └── templates/             ← Project file templates
 ```
 
-> `.claude/commands/` and `workflows/` contain identical files — one for each platform.
+> `.claude/commands/` and `.agent/workflows/` contain identical files — one for each platform.
 
 ---
 
@@ -122,7 +123,7 @@ ateschh-kit/
 | Platform | Slash Commands | Status |
 |----------|---------------|--------|
 | Claude Code | `.claude/commands/` | ✅ Full support |
-| Antigravity | `workflows/` | ✅ Full support |
+| Antigravity | `.agent/workflows/` | ✅ Full support |
 | Cursor | via CLAUDE.md | ✅ Works |
 | Windsurf | via CLAUDE.md | ✅ Works |
 

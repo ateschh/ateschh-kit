@@ -59,8 +59,8 @@ function copySystemFiles(kitDir, targetDir) {
   info('Copying templates/ ...')
   copyDir(path.join(kitDir, 'templates'), path.join(targetDir, 'templates'))
 
-  info('Copying workflows/ (for Antigravity) ...')
-  copyDir(path.join(kitDir, 'workflows'), path.join(targetDir, 'workflows'))
+  info('Copying .agent/workflows/ (for Antigravity) ...')
+  copyDir(path.join(kitDir, '.agent'), path.join(targetDir, '.agent'))
 }
 
 async function main() {

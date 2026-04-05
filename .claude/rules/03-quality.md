@@ -37,3 +37,17 @@ L2 Check:
 ```
 
 Report results to the user before marking the task done.
+
+## File Size Limit
+
+**No file should exceed 500–600 lines of code.**
+
+If a file approaches this limit during implementation:
+1. Stop and split it into logical modules before continuing
+2. Each module should have a single, clear responsibility
+3. Update imports/exports accordingly
+
+This applies to all source files: components, services, utilities, routes, etc.
+Config files and auto-generated files are exempt.
+
+**Why**: Large files degrade AI context quality and make features harder to update independently.

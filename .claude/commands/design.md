@@ -19,29 +19,35 @@ After `/requirements` is locked. Defines what the app looks like and how it's st
 
 Read `projects/{name}/STATE.md`. Confirm Phase 2 is complete.
 
-### Step 2: Spawn Architect Agent
+### Step 2: Gather User Input
 
-Read `agents/architect.md` and spawn the agent.
+Read REQUIREMENTS.md and the idea/brainstorm summary. Then ask 3–5 targeted questions in a **single message** based on what's most unknown. Examples (pick what's relevant):
+
+- What are the core pages or sections you envision? (e.g., dashboard, profile, settings)
+- Who is the primary user — what's their first action when they open the app?
+- Any apps whose structure or layout you admire?
+- What mood/feeling should the UI convey? (minimal, bold, professional, playful)
+- Any brand colors or fonts already in mind?
+- Are there features that are must-have for v1 vs nice-to-have later?
+
+Wait for the user's answers before proceeding.
+
+### Step 3: Spawn Architect Agent
+
+Read `agents/architect.md` and spawn the agent with the idea summary **and user's answers from Step 2**.
 
 The architect:
-1. Reads REQUIREMENTS.md and the idea summary
-2. Defines the app's page structure and navigation
-3. Lists features per page with priority (must-have vs nice-to-have)
-4. Output: STRUCTURE.md draft
+1. Defines the app's page structure and navigation
+2. Lists features per page with priority (must-have vs nice-to-have)
+3. Output: STRUCTURE.md draft
 
 Present to user. Ask for approval before proceeding.
 
-### Step 3: Spawn Designer Agent
+### Step 4: Spawn Designer Agent
 
 Read `agents/designer.md` and spawn the agent.
 
-The designer:
-1. Reads the idea summary and brand direction from the user
-2. Asks 3 quick questions:
-   - What mood/feeling? (e.g., professional, playful, minimal, bold)
-   - Any brand colors? (hex or description)
-   - Font preference or examples you like?
-3. Creates a full design system:
+The designer uses the mood/color/font answers already gathered in Step 2 — **do not ask these questions again**. Creates a full design system:
    - Color palette (primary, secondary, accent, neutrals)
    - Typography scale (font family, sizes, weights)
    - Spacing system
@@ -50,20 +56,20 @@ The designer:
 
 Present to user. Ask for approval.
 
-### Step 4: Lock Files
+### Step 5: Lock Files
 
 Once both are approved:
 - Lock `projects/{name}/DESIGN.md` → status: **LOCKED ✅**
 - Save `projects/{name}/STRUCTURE.md`
 
-### Step 5: Generate PLAN.md
+### Step 6: Generate PLAN.md
 
 Based on STRUCTURE.md, create the initial PLAN.md:
 - List all pages/features as tasks
 - Group into logical build order
 - Estimate complexity per task (S/M/L)
 
-### Step 6: Update STATE.md
+### Step 7: Update STATE.md
 
 Mark Phase 3 complete. Set next task to `/build` (first task in PLAN.md).
 
