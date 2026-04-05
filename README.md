@@ -8,15 +8,17 @@
 ## Install
 
 ```bash
-npx ateschh-kit
+npx ateschh-kit@latest
 ```
 
 That's it. The system is now installed in your current directory.
 
+> Always use `@latest` to make sure you get the newest version — npx caches packages locally.
+
 **Updating an existing install** (keeps your projects intact):
 
 ```bash
-npx ateschh-kit --update
+npx ateschh-kit@latest --update
 ```
 
 ---

@@ -8,15 +8,17 @@
 ## Kurulum
 
 ```bash
-npx ateschh-kit
+npx ateschh-kit@latest
 ```
 
 Hepsi bu. Sistem bulunduğunuz dizine kurulur.
 
+> Her zaman `@latest` kullanın — npx paketleri yerel olarak cache'ler, `@latest` olmadan eski sürümü alabilirsiniz.
+
 **Mevcut kurulumu güncellemek** (projelerinize dokunmaz):
 
 ```bash
-npx ateschh-kit --update
+npx ateschh-kit@latest --update
 ```
 
 ---
