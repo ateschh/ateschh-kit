@@ -45,6 +45,7 @@ If no active project:
 | `/quick` | Ad-hoc task without full pipeline | .claude/commands/quick.md |
 | `/map-codebase` | Analyze existing codebase | .claude/commands/map-codebase.md |
 | `/settings` | View/edit configuration | .claude/commands/settings.md |
+| `/job [n]` | Execute a cross-platform job from mission/ | .claude/commands/job.md |
 
 When a command is run, read the corresponding workflow file and follow its steps.
 

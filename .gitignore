@@ -6,6 +6,9 @@
 projects/
 archive/
 
+# ── Cross-platform job queue ──────────────────────────────────────────────────
+mission/
+
 # ── User-specific MCP config (copy .mcp.example.json → .mcp.json) ─────────────
 .mcp.json
 

@@ -152,6 +152,17 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.3.0] — 2026-04-06
+
+### Added
+
+- `/job [n]` command — execute a cross-platform job from `mission/` folder
+- `mission/` directory — shared job queue between Claude Code and Antigravity (gitignored)
+- Parallel workflow: one platform assigns jobs, the other executes them independently
+- Job file format: PENDING → DONE, result appended to same file
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`

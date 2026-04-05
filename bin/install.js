@@ -124,7 +124,7 @@ async function main() {
     copySystemFiles(kitDir, targetDir)
 
     // Create runtime directories (never overwrite)
-    const dirs = ['.state', 'projects', 'archive']
+    const dirs = ['.state', 'projects', 'archive', 'mission']
     for (const dir of dirs) {
       const dirPath = path.join(targetDir, dir)
       if (!fs.existsSync(dirPath)) {

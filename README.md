@@ -63,6 +63,7 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 | `/quick` | Ad-hoc task without the full pipeline |
 | `/map-codebase` | Analyze an existing codebase |
 | `/settings` | View/edit configuration |
+| `/job [n]` | Execute a cross-platform job from `mission/` |
 
 ---
 
@@ -92,6 +93,13 @@ Claude Code  → /save
 Antigravity  → /resume   ← picks up exactly where you left off
 ```
 
+**Running jobs in parallel across platforms:**
+```
+Claude Code is working → creates mission/job-001.md
+Switch to Antigravity  → /job 1   ← executes and saves result
+Switch back            → check mission/job-001.md or tell Claude "job done"
+```
+
 **Working on an existing codebase:**
 ```
 /map-codebase
@@ -111,7 +119,8 @@ ateschh-kit/
 │   └── workflows/         ← Slash commands (Antigravity native)
 ├── agents/                ← 9 specialist agents
 ├── skills/                ← 9 reusable atomic skills
-└── templates/             ← Project file templates
+├── templates/             ← Project file templates
+└── mission/               ← Cross-platform job queue (gitignored)
 ```
 
 > `.claude/commands/` and `.agent/workflows/` contain identical files — one for each platform.
