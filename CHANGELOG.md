@@ -67,6 +67,14 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.2] — 2026-04-06
+
+### Changed
+
+- `/brainstorm` now gathers user input dynamically before analysis — asks idea description first, then selects 3–5 context-specific follow-up questions
+
+---
+
 ## [1.2.1] — 2026-04-06
 
 ### Fixed
