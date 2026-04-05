@@ -30,21 +30,21 @@ If no active project:
 
 | Command | What it does | Workflow |
 |---------|-------------|---------|
-| `/new-project` | Start a new project | workflows/new-project.md |
-| `/resume` | Continue where you left off | workflows/resume.md |
-| `/brainstorm` | Idea analysis + market research | workflows/brainstorm.md |
-| `/requirements` | Define and lock tech stack | workflows/requirements.md |
-| `/design` | Pages + UI design | workflows/design.md |
-| `/build` | Write page/module code | workflows/build.md |
-| `/test` | Test + fix bugs | workflows/test.md |
-| `/deploy` | Deploy to production | workflows/deploy.md |
-| `/status` | Progress report | workflows/status.md |
-| `/save` | Save context (cross-platform) | workflows/save.md |
-| `/finish` | Complete and archive project | workflows/finish.md |
-| `/next` | Auto-detect and run next step | workflows/next.md |
-| `/quick` | Ad-hoc task without full pipeline | workflows/quick.md |
-| `/map-codebase` | Analyze existing codebase | workflows/map-codebase.md |
-| `/settings` | View/edit configuration | workflows/settings.md |
+| `/new-project` | Start a new project | .claude/commands/new-project.md |
+| `/resume` | Continue where you left off | .claude/commands/resume.md |
+| `/brainstorm` | Idea analysis + market research | .claude/commands/brainstorm.md |
+| `/requirements` | Define and lock tech stack | .claude/commands/requirements.md |
+| `/design` | Pages + UI design | .claude/commands/design.md |
+| `/build` | Write page/module code | .claude/commands/build.md |
+| `/test` | Test + fix bugs | .claude/commands/test.md |
+| `/deploy` | Deploy to production | .claude/commands/deploy.md |
+| `/status` | Progress report | .claude/commands/status.md |
+| `/save` | Save context (cross-platform) | .claude/commands/save.md |
+| `/finish` | Complete and archive project | .claude/commands/finish.md |
+| `/next` | Auto-detect and run next step | .claude/commands/next.md |
+| `/quick` | Ad-hoc task without full pipeline | .claude/commands/quick.md |
+| `/map-codebase` | Analyze existing codebase | .claude/commands/map-codebase.md |
+| `/settings` | View/edit configuration | .claude/commands/settings.md |
 
 When a command is run, read the corresponding workflow file and follow its steps.
 
@@ -145,7 +145,7 @@ ATESCHH-KIT/
 ├── .claude/rules/         ← Auto-loaded rules
 ├── agents/                ← Agent definitions
 ├── skills/                ← Skill definitions
-├── workflows/             ← Slash command logic
+├── .claude/commands/      ← Slash command logic
 ├── context-agent/         ← Context management
 ├── .state/                ← System state (gitignored)
 ├── templates/             ← Project templates

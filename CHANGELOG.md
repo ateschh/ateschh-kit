@@ -67,6 +67,21 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.0] — 2026-04-06
+
+### Changed
+
+- Slash command files moved from `workflows/` to `.claude/commands/`
+- Claude Code now natively recognizes all 15 commands with autocomplete
+- `CLAUDE.md` references updated to reflect new file locations
+- `package.json` files list updated (removed `workflows/`, `.claude/` already included)
+
+### Removed
+
+- `workflows/` directory (commands now live in `.claude/commands/`)
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`
