@@ -1,0 +1,49 @@
+# ── Runtime state (her kullanıcıya özel, repoya girmiyor) ─────────────────────
+.state/
+.state/*.md
+
+# ── Aktif projeler ve arşiv (gerçek proje içeriği) ───────────────────────────
+projects/
+archive/
+
+# ── User-specific MCP config (copy .mcp.example.json → .mcp.json) ─────────────
+.mcp.json
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ── Node.js (projeler Next.js/Expo kullanıyor) ────────────────────────────────
+node_modules/
+.next/
+.expo/
+dist/
+build/
+out/
+
+# ── Environment (asla repoya girmesin) ───────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Claude Code local settings (kullanıcıya özel) ────────────────────────────
+.claude/settings.local.json

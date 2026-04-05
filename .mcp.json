@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "cloudflare": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["mcp-remote", "https://bindings.mcp.cloudflare.com/sse"],
+      "env": {}
+    },
+    "firebase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "firebase-tools@latest", "experimental:mcp"],
+      "env": {}
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "env": {}
+    },
+    "claude-preview": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/claude-preview-mcp@latest"],
+      "env": {}
+    },
+    "claude-in-chrome": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/claude-in-chrome-mcp@latest"],
+      "env": {}
+    },
+    "unity": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "unity-mcp@latest"],
+      "env": {}
+    }
+  }
+}

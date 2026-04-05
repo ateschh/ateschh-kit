@@ -1,0 +1,46 @@
+{
+  "name": "ateschh-kit",
+  "version": "1.0.0",
+  "description": "A structured AI development system for Claude Code and Antigravity",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "antigravity",
+    "ai",
+    "development",
+    "workflow",
+    "agents",
+    "cursor",
+    "windsurf"
+  ],
+  "homepage": "https://github.com/ateschh/ateschh-kit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ateschh/ateschh-kit"
+  },
+  "license": "MIT",
+  "bin": {
+    "ateschh-kit": "./bin/install.js"
+  },
+  "scripts": {
+    "test": "echo \"No automated tests yet\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "agents/",
+    "skills/",
+    "workflows/",
+    "templates/",
+    ".claude/",
+    "CLAUDE.md",
+    "ARCHITECTURE.md",
+    "README.md",
+    "README.tr.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ]
+}
