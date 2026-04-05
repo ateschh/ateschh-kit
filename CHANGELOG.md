@@ -67,6 +67,14 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.1] — 2026-04-06
+
+### Fixed
+
+- `bin/install.js` no longer attempts to copy the removed `workflows/` directory
+
+---
+
 ## [1.2.0] — 2026-04-06
 
 ### Changed

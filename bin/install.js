@@ -71,9 +71,6 @@ async function main() {
     info('Copying .claude/rules/ ...')
     copyDir(path.join(kitDir, '.claude'), path.join(targetDir, '.claude'))
 
-    info('Copying workflows/ ...')
-    copyDir(path.join(kitDir, 'workflows'), path.join(targetDir, 'workflows'))
-
     info('Copying agents/ ...')
     copyDir(path.join(kitDir, 'agents'), path.join(targetDir, 'agents'))
 
