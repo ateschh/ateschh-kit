@@ -120,6 +120,15 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.5] — 2026-04-06
+
+### Added
+
+- `--update` flag for `npx ateschh-kit --update` — updates system files only, never touches `.state/`, `projects/`, or `archive/`
+- Existing installs now show a helpful message pointing to `--update` instead of silently exiting
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`

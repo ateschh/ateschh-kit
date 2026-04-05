@@ -43,47 +43,87 @@ function copyFile(src, dest) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
+function copySystemFiles(kitDir, targetDir) {
+  info('Copying CLAUDE.md...')
+  copyFile(path.join(kitDir, 'CLAUDE.md'), path.join(targetDir, 'CLAUDE.md'))
+
+  info('Copying .claude/ ...')
+  copyDir(path.join(kitDir, '.claude'), path.join(targetDir, '.claude'))
+
+  info('Copying agents/ ...')
+  copyDir(path.join(kitDir, 'agents'), path.join(targetDir, 'agents'))
+
+  info('Copying skills/ ...')
+  copyDir(path.join(kitDir, 'skills'), path.join(targetDir, 'skills'))
+
+  info('Copying templates/ ...')
+  copyDir(path.join(kitDir, 'templates'), path.join(targetDir, 'templates'))
+
+  info('Copying workflows/ (for Antigravity) ...')
+  copyDir(path.join(kitDir, 'workflows'), path.join(targetDir, 'workflows'))
+}
+
 async function main() {
   const args = process.argv.slice(2)
-  const targetDir = args[0] ? path.resolve(args[0]) : process.cwd()
+  const isUpdate = args.includes('--update')
+  const isForce = args.includes('--force')
+  const targetDir = args.filter(a => !a.startsWith('--'))[0]
+    ? path.resolve(args.filter(a => !a.startsWith('--'))[0])
+    : process.cwd()
   const kitDir = path.resolve(__dirname, '..')
 
   log('')
+
+  // ── UPDATE mode ─────────────────────────────────────────────────────────────
+  if (isUpdate) {
+    log('\x1b[1m🔄 ateschh-kit updater\x1b[0m')
+    log('━━━━━━━━━━━━━━━━━━━━━━━━━')
+    log(`Updating: ${targetDir}`)
+    log('')
+
+    if (!fs.existsSync(path.join(targetDir, 'CLAUDE.md'))) {
+      error('ateschh-kit is not installed in this directory.')
+      error('Run without --update to install fresh.')
+      process.exit(1)
+    }
+
+    try {
+      copySystemFiles(kitDir, targetDir)
+
+      log('')
+      log('━━━━━━━━━━━━━━━━━━━━━━━━━')
+      success('ateschh-kit updated!')
+      log('')
+      log('Your projects and state are untouched.')
+      log('Type /resume to continue where you left off.')
+      log('')
+    } catch (err) {
+      error(`Update failed: ${err.message}`)
+      process.exit(1)
+    }
+    return
+  }
+
+  // ── INSTALL mode ─────────────────────────────────────────────────────────────
   log('\x1b[1m🚀 ateschh-kit installer\x1b[0m')
   log('━━━━━━━━━━━━━━━━━━━━━━━━━')
   log(`Installing to: ${targetDir}`)
   log('')
 
-  // Check if already installed
   if (fs.existsSync(path.join(targetDir, 'CLAUDE.md'))) {
-    warn('CLAUDE.md already exists in this directory.')
-    warn('Use --force to overwrite.')
-    if (!args.includes('--force')) {
+    warn('ateschh-kit is already installed in this directory.')
+    warn('To update system files without touching your projects, run:')
+    warn('  npx ateschh-kit --update')
+    warn('To overwrite everything, run with --force.')
+    if (!isForce) {
       process.exit(0)
     }
   }
 
   try {
-    // Copy core files
-    info('Copying CLAUDE.md...')
-    copyFile(path.join(kitDir, 'CLAUDE.md'), path.join(targetDir, 'CLAUDE.md'))
+    copySystemFiles(kitDir, targetDir)
 
-    info('Copying .claude/rules/ ...')
-    copyDir(path.join(kitDir, '.claude'), path.join(targetDir, '.claude'))
-
-    info('Copying agents/ ...')
-    copyDir(path.join(kitDir, 'agents'), path.join(targetDir, 'agents'))
-
-    info('Copying skills/ ...')
-    copyDir(path.join(kitDir, 'skills'), path.join(targetDir, 'skills'))
-
-    info('Copying templates/ ...')
-    copyDir(path.join(kitDir, 'templates'), path.join(targetDir, 'templates'))
-
-    info('Copying workflows/ (for Antigravity) ...')
-    copyDir(path.join(kitDir, 'workflows'), path.join(targetDir, 'workflows'))
-
-    // Create runtime directories
+    // Create runtime directories (never overwrite)
     const dirs = ['.state', 'projects', 'archive']
     for (const dir of dirs) {
       const dirPath = path.join(targetDir, dir)
