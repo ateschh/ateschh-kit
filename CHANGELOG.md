@@ -98,6 +98,15 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.3] — 2026-04-06
+
+### Changed
+
+- `/design` now gathers user input dynamically (pages, mood, colors, fonts) before spawning architect and designer agents — designer does not re-ask questions already collected
+- Added 500–600 line file size limit rule (`03-quality.md`) — source files exceeding this must be split into modules before continuing
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`
