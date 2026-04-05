@@ -1,6 +1,6 @@
 # ateschh-kit
 
-> Claude Code ve Antigravity için yapılandırılmış bir AI geliştirme sistemi.  
+> Claude Code ve Antigravity için yapılandırılmış bir AI geliştirme sistemi.
 > Fikirden dağıtıma kadar, bağlam kaybı ve proje terk etme olmadan çalışır.
 
 ---
@@ -12,6 +12,12 @@ npx ateschh-kit
 ```
 
 Hepsi bu. Sistem bulunduğunuz dizine kurulur.
+
+**Mevcut kurulumu güncellemek** (projelerinize dokunmaz):
+
+```bash
+npx ateschh-kit --update
+```
 
 ---
 
@@ -44,7 +50,7 @@ Her aşama geçiş gerektiriyor. Brainstorm'dan direkt kodlamaya geçemezsiniz.
 | `/new-project` | Yeni proje başlat |
 | `/brainstorm` | Fikir analizi + pazar araştırması |
 | `/requirements` | Teknoloji yığınını seç ve kilitle |
-| `/design` | Sayfalar, özellikler ve versal sistem |
+| `/design` | Sayfalar, özellikler ve tasarım sistemi |
 | `/build` | Plandan bir görevi uygula |
 | `/test` | L1–L4 kalite kontrolleri |
 | `/deploy` | Üretim ortamına dağıt |
@@ -63,7 +69,7 @@ Her aşama geçiş gerektiriyor. Brainstorm'dan direkt kodlamaya geçemezsiniz.
 **Yeni proje başlatmak:**
 ```
 /new-project
-/brainstorm  ← fikrinizi anlatın
+/brainstorm  ← fikrinizi anlatın, Claude takip soruları sorar
 /requirements
 /design
 /build  ← tamamlanana kadar tekrarlayın
@@ -78,6 +84,12 @@ Her aşama geçiş gerektiriyor. Brainstorm'dan direkt kodlamaya geçemezsiniz.
 /next  ← kaldığınız yeri otomatik tespit eder
 ```
 
+**Claude Code ile Antigravity arasında geçiş:**
+```
+Claude Code  → /save
+Antigravity  → /resume   ← tam kaldığınız yerden devam eder
+```
+
 **Mevcut bir proje üzerinde çalışmak:**
 ```
 /map-codebase
@@ -90,24 +102,27 @@ Her aşama geçiş gerektiriyor. Brainstorm'dan direkt kodlamaya geçemezsiniz.
 ```
 ateschh-kit/
 ├── CLAUDE.md              ← Ana orkestrasyon dosyası
-├── .claude/rules/         ← 7 otomatik yüklenen davranış kuralı
+├── .claude/
+│   ├── rules/             ← 7 otomatik yüklenen davranış kuralı
+│   └── commands/          ← Slash komutları (Claude Code native)
+├── workflows/             ← Slash komutları (Antigravity)
 ├── agents/                ← 9 uzman ajan
 ├── skills/                ← 9 yeniden kullanılabilir atomik yetenek
-├── workflows/             ← 15 slash-komut iş akışı
-├── templates/             ← Proje dosyası şablonları
-└── context-agent/         ← Bağlam yönetim sistemi
+└── templates/             ← Proje dosyası şablonları
 ```
+
+> `.claude/commands/` ve `workflows/` birebir aynı dosyaları içerir — her platform için biri.
 
 ---
 
 ## Desteklenen Platformlar
 
-| Platform | Durum |
-|----------|-------|
-| Claude Code | ✅ Tam destek |
-| Antigravity | ✅ Tam destek |
-| Cursor | ✅ Çalışır (agents klasörü) |
-| Windsurf | ✅ Çalışır (agents klasörü) |
+| Platform | Slash Komutları | Durum |
+|----------|----------------|-------|
+| Claude Code | `.claude/commands/` | ✅ Tam destek |
+| Antigravity | `workflows/` | ✅ Tam destek |
+| Cursor | CLAUDE.md üzerinden | ✅ Çalışır |
+| Windsurf | CLAUDE.md üzerinden | ✅ Çalışır |
 
 ---
 
@@ -123,14 +138,16 @@ ateschh-kit/
 
 ---
 
-## Çapraz Platform Bağlamı
+## Kalite Seviyeleri
 
-Aynı proje üzerinde Claude Code ve Antigravity'den dönüşümlü çalışın:
+Her görev devam etmeden önce bu seviyeleri geçmek zorunda:
 
-```
-Platform A → /save
-Platform B → /resume   ← tam kaldığınız yerden devam eder
-```
+| Seviye | Ne Kontrol Eder | Ne Zaman |
+|--------|----------------|---------|
+| L1 | Build/tip/lint hatası yok | Her zaman |
+| L2 | Özellik tanımlandığı gibi çalışıyor | Her zaman |
+| L3 | Tüm sistem içinde doğru çalışıyor | `/test`'te |
+| L4 | Performans, güvenlik, UX | `/deploy` öncesi |
 
 ---
 

@@ -129,6 +129,19 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.6] — 2026-04-06
+
+### Changed
+
+- `README.md` and `README.tr.md` updated to reflect current state:
+  - `--update` flag documented
+  - Dual-platform slash command directories explained (`.claude/commands/` vs `workflows/`)
+  - "Switching between Claude Code and Antigravity" section added
+  - Quality levels table added
+  - File structure diagram updated
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`

@@ -1,6 +1,6 @@
 # ateschh-kit
 
-> A structured AI development system for Claude Code and Antigravity.  
+> A structured AI development system for Claude Code and Antigravity.
 > Goes from idea to deployment without context rot or project abandonment.
 
 ---
@@ -12,6 +12,12 @@ npx ateschh-kit
 ```
 
 That's it. The system is now installed in your current directory.
+
+**Updating an existing install** (keeps your projects intact):
+
+```bash
+npx ateschh-kit --update
+```
 
 ---
 
@@ -63,7 +69,7 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 **Starting a new project:**
 ```
 /new-project
-/brainstorm  ← describe your idea
+/brainstorm  ← describe your idea, Claude asks follow-up questions
 /requirements
 /design
 /build  ← repeat until done
@@ -78,6 +84,12 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 /next  ← automatically detects where you left off
 ```
 
+**Switching between Claude Code and Antigravity:**
+```
+Claude Code  → /save
+Antigravity  → /resume   ← picks up exactly where you left off
+```
+
 **Working on an existing codebase:**
 ```
 /map-codebase
@@ -90,24 +102,27 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 ```
 ateschh-kit/
 ├── CLAUDE.md              ← Main orchestration file
-├── .claude/rules/         ← 7 auto-loaded behavioral rules
+├── .claude/
+│   ├── rules/             ← 7 auto-loaded behavioral rules
+│   └── commands/          ← Slash commands (Claude Code native)
+├── workflows/             ← Slash commands (Antigravity)
 ├── agents/                ← 9 specialist agents
 ├── skills/                ← 9 reusable atomic skills
-├── workflows/             ← 15 slash-command workflows
-├── templates/             ← Project file templates
-└── context-agent/         ← Context management system
+└── templates/             ← Project file templates
 ```
+
+> `.claude/commands/` and `workflows/` contain identical files — one for each platform.
 
 ---
 
 ## Supported Platforms
 
-| Platform | Status |
-|----------|--------|
-| Claude Code | ✅ Full support |
-| Antigravity | ✅ Full support |
-| Cursor | ✅ Works (agents folder) |
-| Windsurf | ✅ Works (agents folder) |
+| Platform | Slash Commands | Status |
+|----------|---------------|--------|
+| Claude Code | `.claude/commands/` | ✅ Full support |
+| Antigravity | `workflows/` | ✅ Full support |
+| Cursor | via CLAUDE.md | ✅ Works |
+| Windsurf | via CLAUDE.md | ✅ Works |
 
 ---
 
@@ -123,14 +138,16 @@ ateschh-kit/
 
 ---
 
-## Cross-Platform Context
+## Quality Gates
 
-Work on the same project from Claude Code and Antigravity interchangeably:
+Every task must pass before moving on:
 
-```
-Platform A → /save
-Platform B → /resume   ← picks up exactly where you left off
-```
+| Level | What it checks | When |
+|-------|---------------|------|
+| L1 | No build/type/lint errors | Always |
+| L2 | Feature works as described | Always |
+| L3 | Works within the full system | At `/test` |
+| L4 | Performance, security, UX | Before `/deploy` |
 
 ---
 
