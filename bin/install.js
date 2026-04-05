@@ -80,6 +80,9 @@ async function main() {
     info('Copying templates/ ...')
     copyDir(path.join(kitDir, 'templates'), path.join(targetDir, 'templates'))
 
+    info('Copying workflows/ (for Antigravity) ...')
+    copyDir(path.join(kitDir, 'workflows'), path.join(targetDir, 'workflows'))
+
     // Create runtime directories
     const dirs = ['.state', 'projects', 'archive']
     for (const dir of dirs) {

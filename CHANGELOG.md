@@ -107,6 +107,19 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.2.4] — 2026-04-06
+
+### Added
+
+- `workflows/` directory restored — mirrors `.claude/commands/` for Antigravity compatibility
+- Both Claude Code (`.claude/commands/`) and Antigravity (`workflows/`) now supported simultaneously
+
+### Changed
+
+- `bin/install.js` now copies `workflows/` in addition to `.claude/` during installation
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`
