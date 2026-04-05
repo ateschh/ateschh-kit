@@ -19,21 +19,29 @@ After `/brainstorm` is complete and the idea is validated.
 
 Read `projects/{name}/STATE.md`. Confirm Phase 1 is complete.
 
-### Step 2: Spawn Requirements Expert Agent
+### Step 2: Gather User Preferences
 
-Read `agents/requirements-expert.md` and spawn the agent.
+Read the idea summary and brainstorm output from the session. Based on the project type and target platform, identify the most important unknowns and ask 3–5 targeted questions in a **single message**. Examples of what to probe (pick what's relevant):
+
+- Do you have a preferred framework or language? Any tech you definitely want to avoid?
+- What's the deployment target? (Vercel, AWS, self-hosted, mobile app store, etc.)
+- What's the expected scale at launch? (personal use, small team, public-facing)
+- Is there an existing codebase or infrastructure this needs to connect to?
+- What's the team's experience level with specific technologies?
+- Any hard constraints — budget for paid services, compliance requirements, offline support?
+
+Wait for the user's answers before proceeding.
+
+### Step 3: Spawn Requirements Expert Agent
+
+Read `agents/requirements-expert.md` and spawn the agent with the idea summary **and the user's answers from Step 2**.
 
 The agent:
-1. Reads the idea summary from the session
-2. Evaluates the best tech stack based on:
-   - Platform target (web, mobile, game, backend)
-   - Scale expectations
-   - Deployment requirements
-   - User's stated preferences (if any)
-3. Proposes a full stack with reasoning
-4. Uses Context7 MCP to verify library compatibility if needed
+1. Evaluates the best tech stack based on all gathered context
+2. Proposes a full stack with clear reasoning for each choice
+3. Uses Context7 MCP to verify library compatibility if needed
 
-### Step 3: Present Stack to User
+### Step 4: Present Stack to User
 
 ```
 ## Proposed Tech Stack for {project}
@@ -49,14 +57,14 @@ The agent:
 
 Ask: "Does this stack work for you? Once confirmed, it cannot be changed without formal review."
 
-### Step 4: Lock REQUIREMENTS.md
+### Step 5: Lock REQUIREMENTS.md
 
 Use the `requirements-lock` skill:
 - Fill in `projects/{name}/REQUIREMENTS.md` completely
 - Set status to **LOCKED ✅**
 - Include all versions
 
-### Step 5: Log Decision
+### Step 6: Log Decision
 
 Append to `projects/{name}/DECISIONS.md`:
 ```
@@ -65,11 +73,11 @@ Append to `projects/{name}/DECISIONS.md`:
 - Reason: {brief rationale}
 ```
 
-### Step 6: Update STATE.md
+### Step 7: Update STATE.md
 
 Mark Phase 2 complete. Set next task to `/design`.
 
-### Step 7: Confirm to User
+### Step 8: Confirm to User
 
 ```
 ✅ Tech stack locked!
