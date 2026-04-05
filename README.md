@@ -140,13 +140,22 @@ ateschh-kit/
 
 ## Supported Stacks
 
-| Type | Default Stack |
+The `/requirements` phase picks the right stack for your project. These are common starting points:
+
+| Type | Example Stack |
 |------|--------------|
 | Web App | Next.js + Supabase + Vercel |
+| SaaS | Next.js + Supabase + Stripe + Vercel |
 | Mobile | Expo + Supabase |
-| Browser Extension | Plasmo + TypeScript |
 | Backend API | Hono + Cloudflare Workers |
+| Browser Extension | Plasmo + TypeScript |
 | Desktop | Electron / Tauri |
+| AI App | Next.js + Vercel AI SDK + OpenAI |
+| CLI Tool | Node.js + TypeScript + Bun |
+| Admin Dashboard | Next.js + Prisma + PostgreSQL |
+| Game (Web) | Phaser + TypeScript |
+
+Any stack works — the system adapts to what you choose during `/requirements`.
 
 ---
 

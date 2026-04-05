@@ -131,13 +131,22 @@ ateschh-kit/
 
 ## Desteklenen Teknoloji Yığınları
 
-| Tür | Varsayılan Yığın |
-|-----|----------------|
+`/requirements` aşaması projenize uygun yığını seçer. Bunlar yaygın başlangıç noktalarıdır:
+
+| Tür | Örnek Yığın |
+|-----|------------|
 | Web Uygulaması | Next.js + Supabase + Vercel |
+| SaaS | Next.js + Supabase + Stripe + Vercel |
 | Mobil | Expo + Supabase |
-| Tarayıcı Uzantısı | Plasmo + TypeScript |
 | Backend API | Hono + Cloudflare Workers |
+| Tarayıcı Uzantısı | Plasmo + TypeScript |
 | Masaüstü | Electron / Tauri |
+| AI Uygulaması | Next.js + Vercel AI SDK + OpenAI |
+| CLI Aracı | Node.js + TypeScript + Bun |
+| Admin Paneli | Next.js + Prisma + PostgreSQL |
+| Oyun (Web) | Phaser + TypeScript |
+
+Her yığın çalışır — sistem `/requirements` aşamasında seçtiğinize uyum sağlar.
 
 ---
 
