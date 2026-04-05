@@ -19,13 +19,27 @@ After `/new-project`, when you have an idea and want to analyze it properly befo
 
 Read `projects/{name}/STATE.md` to confirm we're in Phase 1.
 
-### Step 2: Spawn Idea Analyst Agent
+### Step 2: Gather User Input
 
-Read `agents/idea-analyst.md` and spawn the agent with the user's idea.
+Ask the user to describe their idea in their own words — no structure required, just whatever is on their mind.
+
+After reading the response, identify 3–5 follow-up questions that are **specific to this idea**. Choose questions that close the most important gaps in understanding. Examples of what to probe (pick what's relevant, don't ask all):
+
+- Who is the primary user and what pain do they have today?
+- What geography or market segment is the pilot targeting?
+- Is there a business model in mind (B2B, B2C, marketplace, SaaS)?
+- Are there any hard constraints (budget, timeline, regulation, existing tech)?
+- What does "success in 6 months" look like?
+- Has this been tried before — what happened?
+
+Ask all chosen questions in a **single message** (numbered list). Wait for the user's answers before proceeding.
+
+### Step 3: Spawn Idea Analyst Agent
+
+Read `agents/idea-analyst.md` and spawn the agent with the user's idea **and their answers from Step 2**.
 
 The idea-analyst uses the `idea-analysis` skill:
-- Asks 5 core questions using the Socratic method
-- Goal: understand the problem, target user, core value, and what success looks like
+- Analyzes the problem, target user, core value, and success criteria
 - Output: structured idea summary
 
 Report findings to the user. Ask for confirmation before proceeding.
