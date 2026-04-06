@@ -7,85 +7,55 @@ skills: []
 outputs: [".state/USER-CONFIG.md"]
 ---
 
-# /settings — View & Edit Configuration
+# /settings
 
 ## Steps
 
-### Step 1: Read Config
-
-Read `.state/USER-CONFIG.md`:
-- If it exists → display current settings
-- If it doesn't exist → run first-time setup
-
-### Step 2: Display Settings
-
-```
-⚙️ ateschh-kit Settings
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Kit Version:     1.0.0
-Config File:     .state/USER-CONFIG.md
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-What would you like to change?
-1. View all settings
-2. Set active project
-3. Reset all state
-4. View system info
-5. Cancel
-```
-
-### Option 1: View All Settings
-
-Display contents of `.state/USER-CONFIG.md` in formatted output.
-
-### Option 2: Set Active Project
-
-List all projects in `projects/` folder.
-Ask: "Which project should be active?"
-Update `.state/ACTIVE-PROJECT.md`.
-
-### Option 3: Reset All State
-
-⚠️ Warning dialog:
-```
-WARNING: This will clear:
-- Active project reference
-- Session log
-- Active context
-
-It will NOT delete your projects/ or archive/ folders.
-
-Type "RESET" to confirm.
-```
-
-If confirmed:
-- Clear `.state/ACTIVE-PROJECT.md`
-- Clear `.state/ACTIVE_CONTEXT.md`
-- Leave `SESSION-LOG.md` intact (historical record)
-
-### Option 4: View System Info
-
-```
-System Info:
-- OS: {detected OS}
-- Kit location: {current directory}
-- Projects: {count} active, {count} archived
-- Total sessions: {count from SESSION-LOG.md}
-- Context7 MCP: {connected / not connected}
-- Other MCPs: {list}
-```
+1. Read `.state/USER-CONFIG.md`:
+   - Exists → display current settings
+   - Doesn't exist → run first-time setup (create with defaults)
+2. Display menu:
+   ```
+   ⚙️ ateschh-kit Settings
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Config File: .state/USER-CONFIG.md
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   1. View all settings
+   2. Set active project
+   3. Reset all state
+   4. View system info
+   5. Cancel
+   ```
+3. Handle selection:
+   - **1 — View all**: display USER-CONFIG.md formatted
+   - **2 — Set active project**: list `projects/` → ask which → update `.state/ACTIVE-PROJECT.md`
+   - **3 — Reset state**: show warning:
+     ```
+     WARNING: This will clear:
+     - Active project reference
+     - Session log
+     - Active context
+     It will NOT delete projects/ or archive/.
+     Type "RESET" to confirm.
+     ```
+     If confirmed: clear ACTIVE-PROJECT.md and ACTIVE_CONTEXT.md (leave SESSION-LOG.md intact)
+   - **4 — System info**:
+     ```
+     - OS: {detected}
+     - Kit location: {current directory}
+     - Projects: {count} active, {count} archived
+     - Total sessions: {count from SESSION-LOG.md}
+     - Context7 MCP: {connected / not connected}
+     - Other MCPs: {list}
+     ```
 
 ## USER-CONFIG.md Format
 
 ```markdown
 # User Configuration
-
 **Created**: {date}
 **Version**: 1.0.0
-
 ## Preferences
-
 (No preferences configured yet — defaults are used)
 ```
 

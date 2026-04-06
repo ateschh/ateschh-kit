@@ -1,53 +1,19 @@
 # Quality Standards
 
-## Four Quality Levels
+| Level | Checks | When |
+|-------|--------|------|
+| L1 | No build/type/lint errors | Always |
+| L2 | Feature works as described | Always |
+| L3 | Works within full system | At /test |
+| L4 | Performance, security, UX | Before /deploy |
 
-Every piece of code must pass quality checks before moving forward.
+## L2 Gate
+Cannot proceed to next task until L2 passes. If L2 fails: diagnose → fix → re-verify.
 
-| Level | Name | What it checks | When required |
-|-------|------|---------------|---------------|
-| L1 | Syntax | No build errors, no type errors, no lint errors | Always |
-| L2 | Functionality | The feature works as described | Always |
-| L3 | Integration | Works correctly within the whole system | At /test |
-| L4 | Quality | Performance, security, accessibility, UX | Before /deploy |
-
-## The L2 Gate
-
-**You cannot proceed to the next task until L2 passes.**
-
-If L2 fails:
-1. Diagnose the issue immediately
-2. Fix it in the same task
-3. Re-verify before moving on
-
-## Verification After Every Task
-
-After completing each task, run:
-
-```
-L1 Check:
-- [ ] Build runs without errors
-- [ ] No type errors
-- [ ] No lint errors
-
-L2 Check:
-- [ ] The described feature works
-- [ ] No red errors in console
-- [ ] Core user flow completes
-```
-
-Report results to the user before marking the task done.
+## After Every Task
+- [ ] Build passes, no type errors, no lint errors (L1)
+- [ ] Feature works, no console errors, core flow completes (L2)
+- Report results to user before marking done
 
 ## File Size Limit
-
-**No file should exceed 500–600 lines of code.**
-
-If a file approaches this limit during implementation:
-1. Stop and split it into logical modules before continuing
-2. Each module should have a single, clear responsibility
-3. Update imports/exports accordingly
-
-This applies to all source files: components, services, utilities, routes, etc.
-Config files and auto-generated files are exempt.
-
-**Why**: Large files degrade AI context quality and make features harder to update independently.
+No source file may exceed 500–600 lines. If approaching limit: stop, split into logical modules, update imports. Config and auto-generated files exempt.
