@@ -46,6 +46,7 @@ If no active project:
 | `/map-codebase` | Analyze existing codebase | .claude/commands/map-codebase.md |
 | `/settings` | View/edit configuration | .claude/commands/settings.md |
 | `/job [n]` | Execute a cross-platform job from mission/ | .claude/commands/job.md |
+| `/run` | Compile, run, fix errors, log the process | .claude/commands/run.md |
 
 When a command is run, read the corresponding workflow file and follow its steps.
 

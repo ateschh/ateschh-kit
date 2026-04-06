@@ -163,6 +163,14 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.3.1] — 2026-04-06
+
+### Added
+
+- `/run` command — compiles and starts the app, auto-fixes errors, appends full log to `projects/{name}/run-log.md`
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`

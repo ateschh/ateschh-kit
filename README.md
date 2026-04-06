@@ -64,6 +64,7 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 | `/map-codebase` | Analyze an existing codebase |
 | `/settings` | View/edit configuration |
 | `/job [n]` | Execute a cross-platform job from `mission/` |
+| `/run` | Compile, run the app, fix errors, log everything |
 
 ---
 
