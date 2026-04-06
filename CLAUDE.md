@@ -47,6 +47,7 @@ If no active project:
 | `/settings` | View/edit configuration | .claude/commands/settings.md |
 | `/job [n]` | Execute a cross-platform job from mission/ | .claude/commands/job.md |
 | `/run` | Compile, run, fix errors, log the process | .claude/commands/run.md |
+| `/edit` | Fine-tune an existing page or component | .claude/commands/edit.md |
 
 When a command is run, read the corresponding workflow file and follow its steps.
 

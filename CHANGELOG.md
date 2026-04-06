@@ -171,6 +171,14 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.3.2] — 2026-04-06
+
+### Added
+
+- `/edit` command — focused editing of existing pages, components, or files; stays within DESIGN.md constraints; L1+L2 check after each change
+
+---
+
 ## [Unreleased]
 
 - Wave-based parallel task execution for `/build`
