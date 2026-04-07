@@ -61,6 +61,12 @@ function copySystemFiles(kitDir, targetDir) {
 
   info('Copying .agent/workflows/ (for Antigravity) ...')
   copyDir(path.join(kitDir, '.agent'), path.join(targetDir, '.agent'))
+
+  info('Copying .opencode/commands/ (for OpenCode) ...')
+  copyDir(path.join(kitDir, '.opencode'), path.join(targetDir, '.opencode'))
+
+  info('Copying AGENTS.md (for OpenCode) ...')
+  copyFile(path.join(kitDir, 'AGENTS.md'), path.join(targetDir, 'AGENTS.md'))
 }
 
 async function main() {

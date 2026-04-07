@@ -6,6 +6,17 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.4] — 2026-04-07
+
+### Added
+
+**OpenCode support**
+- Added `.opencode/commands/` — all slash commands now work in OpenCode
+- Added `AGENTS.md` — OpenCode's equivalent of CLAUDE.md (system instructions)
+- Installer now copies `.opencode/` and `AGENTS.md` to target directory
+
+---
+
 ## [1.4.3] — 2026-04-07
 
 ### Fixed
