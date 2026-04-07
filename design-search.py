@@ -17,7 +17,7 @@ import os
 # Add the scripts directory to path so relative imports work
 _engine_scripts = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    "design-engine", "src", "ui-ux-pro-max", "scripts"
+    "design-engine", "scripts"
 )
 sys.path.insert(0, _engine_scripts)
 
