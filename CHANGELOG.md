@@ -6,6 +6,17 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.3] — 2026-04-07
+
+### Fixed
+
+**Antigravity workflow sync**
+- Added missing `/wireframe`, `/workspace`, `/app` workflows to `.agent/workflows/`
+- Synced all `.agent/workflows/` files with latest `.claude/commands/` versions
+- `design`, `build`, `finish`, `map-codebase`, `resume` and others were outdated in `.agent/` — now identical
+
+---
+
 ## [1.4.2] — 2026-04-07
 
 ### Changed
