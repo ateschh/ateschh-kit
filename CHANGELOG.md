@@ -6,6 +6,20 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.2] — 2026-04-07
+
+### Changed
+
+**`/map-codebase` — Full System Integration**
+- Now a complete 3-phase workflow: Analysis → Integration → Handoff
+- Phase 2 (new): Generates REQUIREMENTS.md, STRUCTURE.md, DESIGN.md, STATE.md, PLAN.md, and ACTIVE-PROJECT.md from analysis results
+- User chooses: Continue from where the project left off, or Restart from scratch
+- If Restart: option to keep existing code or clear src/ and start fresh
+- After mapping, all commands (`/build`, `/test`, `/deploy`, etc.) work immediately as if the project was started here from the beginning
+- Phase 3 (new): Handoff report with estimated completion %, what's done, what's left, and suggested next command
+
+---
+
 ## [1.4.1] — 2026-04-07
 
 ### Added
