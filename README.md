@@ -1,6 +1,6 @@
 # ateschh-kit
 
-> A structured AI development system for Claude Code and Antigravity.
+> A structured AI development system for Claude Code, Antigravity, and OpenCode.
 > Goes from idea to deployment without context rot or project abandonment.
 
 ---
@@ -103,10 +103,11 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 /next  ← automatically detects where you left off
 ```
 
-**Switching between Claude Code and Antigravity:**
+**Switching between platforms:**
 ```
 Claude Code  → /save
 Antigravity  → /resume   ← picks up exactly where you left off
+OpenCode     → /resume   ← same
 ```
 
 **Running jobs in parallel across platforms:**
@@ -133,6 +134,8 @@ ateschh-kit/
 │   └── commands/          ← Slash commands (Claude Code native)
 ├── .agent/
 │   └── workflows/         ← Slash commands (Antigravity native)
+├── .opencode/
+│   └── commands/          ← Slash commands (OpenCode native)
 ├── agents/                ← 9 specialist agents
 ├── skills/                ← 9 reusable atomic skills
 ├── templates/
@@ -143,7 +146,7 @@ ateschh-kit/
 └── mission/               ← Cross-platform job queue (gitignored)
 ```
 
-> `.claude/commands/` and `.agent/workflows/` contain identical files — one for each platform.
+> `.claude/commands/`, `.agent/workflows/`, and `.opencode/commands/` contain identical files — one set per platform.
 
 ---
 
@@ -153,6 +156,7 @@ ateschh-kit/
 |----------|---------------|--------|
 | Claude Code | `.claude/commands/` | ✅ Full support |
 | Antigravity | `.agent/workflows/` | ✅ Full support |
+| OpenCode | `.opencode/commands/` | ✅ Full support |
 | Cursor | via CLAUDE.md | ✅ Works |
 | Windsurf | via CLAUDE.md | ✅ Works |
 
