@@ -10,7 +10,9 @@ skills: ["run-tests", "fix-bugs"]
 
 ## Steps
 
-1. Read STATE.md — confirm all Phase 4 tasks checked off.
+> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`.
+
+1. Read `{path}/STATE.md` — confirm all Phase 4 tasks checked off. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
 2. Read `agents/tester.md` — run full L1–L4 suite:
    - L1: build exits 0, zero TS errors, zero ESLint errors
    - L2: each feature in STRUCTURE.md works

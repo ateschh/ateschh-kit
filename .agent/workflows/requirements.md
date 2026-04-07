@@ -10,7 +10,9 @@ skills: ["requirements-lock"]
 
 ## Steps
 
-1. Read `projects/{name}/STATE.md` — confirm Phase 1 complete.
+> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`.
+
+1. Read `{path}/STATE.md` — confirm Phase 1 complete. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
 2. Ask 3–5 targeted questions in one message (pick relevant): preferred framework/language, deployment target, expected scale, existing infrastructure, team experience, hard constraints (budget, compliance, offline). Wait for answers.
 3. Read `agents/requirements-expert.md` — propose stack with idea + user answers. Uses Context7 if needed.
 4. Present stack:

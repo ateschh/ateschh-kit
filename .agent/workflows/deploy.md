@@ -11,6 +11,8 @@ outputs: ["Live URL", "Updated STATE.md", "Deployment log"]
 
 ## Steps
 
+> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`. Deploy the active app only; switch with `/app [name]` to deploy others.
+
 1. Pre-deploy checklist:
    - [ ] L1–L4 all pass
    - [ ] `.env` variables correct (not test values)
