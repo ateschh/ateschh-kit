@@ -28,7 +28,7 @@ npx ateschh-kit@latest --update
 A structured workflow system that guides AI agents through the full software development lifecycle:
 
 ```
-/brainstorm → /requirements → /design → /build → /test → /deploy
+/brainstorm → /requirements → /design → /wireframe (optional) → /build → /test → /deploy
 ```
 
 Each phase is gated. You can't accidentally skip from brainstorm straight to coding.
@@ -42,6 +42,7 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 | Scope creep | New ideas go to BACKLOG.md — not now |
 | Project abandonment | STATE.md always knows what's next |
 | "Just fix this one thing" rabbit holes | `/quick` for ad-hoc tasks, `/next` for auto-pilot |
+| AI codes the wrong layout or misses features | `/wireframe` locks every page's content before coding starts |
 
 ---
 
@@ -54,7 +55,8 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 | `/app [name]` | Add a new app or switch between apps in a workspace |
 | `/brainstorm` | Analyze your idea + research the market |
 | `/requirements` | Select and lock the tech stack |
-| `/design` | Define pages, features, and visual system |
+| `/design` | Choose visual theme + define page structure |
+| `/wireframe` | Define each page's content and layout in detail (optional) |
 | `/build` | Implement one task from the plan |
 | `/test` | Run L1–L4 quality checks |
 | `/deploy` | Deploy to production |
@@ -76,10 +78,11 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 **Starting a new project:**
 ```
 /new-project
-/brainstorm  ← describe your idea, Claude asks follow-up questions
+/brainstorm    ← describe your idea, Claude asks follow-up questions
 /requirements
-/design
-/build  ← repeat until done
+/design        ← pick a visual theme, approve the page structure
+/wireframe     ← optional: define each page's content + layout before coding
+/build         ← repeat until done
 /test
 /deploy
 ```

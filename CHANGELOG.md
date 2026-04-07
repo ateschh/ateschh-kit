@@ -6,6 +6,30 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.1] — 2026-04-07
+
+### Added
+
+**`/wireframe` — New Optional Phase**
+- New command between `/design` and `/build`
+- Phase 1: Claude proposes a written content list for each page (sections, components, actions) — based on market research findings and design system. User approves or edits one page at a time.
+- Phase 2: After all pages are content-approved, ASCII layouts are generated. User gives final approval.
+- Locks `WIREFRAMES.md` — source of truth for all build tasks.
+- `/build` reads `WIREFRAMES.md` if present and codes exactly what's defined.
+
+### Changed
+
+**`/design` — Refined Flow**
+- Theme first: Claude proposes 2–3 visual options with mood, palette, font pairing, and real-world examples (e.g. "Linear-style", "Notion-style")
+- Page structure second: Claude suggests the page tree based on brainstorm + competitor findings. Each page listed with purpose and key features.
+- Both steps require explicit user approval before locking.
+
+**`/build`** — Now shows wireframe reference per task if `WIREFRAMES.md` exists.
+
+**`/status`** — Added Phase 3.5 Wireframes row.
+
+---
+
 ## [1.4.0] — 2026-04-07
 
 ### Added
