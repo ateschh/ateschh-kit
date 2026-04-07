@@ -6,6 +6,7 @@
 | REQUIREMENTS.md | Tech stack + libraries | ✅ Yes |
 | DESIGN.md | Colors, fonts, UI system | ✅ Yes |
 | STRUCTURE.md | Pages and features | No |
+| WIREFRAMES.md | Per-page content + ASCII layout | ✅ After /wireframe |
 | STATE.md | Current progress (live) | No |
 | PLAN.md | Task details | No |
 | DECISIONS.md | Why X was chosen | No |

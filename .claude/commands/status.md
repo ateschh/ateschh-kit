@@ -36,6 +36,7 @@ outputs: ["Progress report"]
    Phase 1 — Idea & Research:  ✅ Complete
    Phase 2 — Requirements:     ✅ Complete
    Phase 3 — Design:           ✅ Complete
+   Phase 3.5 — Wireframes:     ✅ Complete  {or ⬜ Skipped / 🔄 In Progress}
    Phase 4 — Build:            🔄 In Progress (6/12 tasks)
    Phase 5 — Test:             ⬜ Not started
    Phase 6 — Deploy:           ⬜ Not started

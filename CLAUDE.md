@@ -36,7 +36,8 @@ If no active project:
 | `/resume` | Continue where you left off | .claude/commands/resume.md |
 | `/brainstorm` | Idea analysis + market research | .claude/commands/brainstorm.md |
 | `/requirements` | Define and lock tech stack | .claude/commands/requirements.md |
-| `/design` | Pages + UI design | .claude/commands/design.md |
+| `/design` | Theme + page structure | .claude/commands/design.md |
+| `/wireframe` | Define each page in detail before coding | .claude/commands/wireframe.md |
 | `/build` | Write page/module code | .claude/commands/build.md |
 | `/test` | Test + fix bugs | .claude/commands/test.md |
 | `/deploy` | Deploy to production | .claude/commands/deploy.md |
