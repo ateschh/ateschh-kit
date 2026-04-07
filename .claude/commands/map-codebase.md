@@ -15,9 +15,22 @@ Analyzes an existing codebase — whether half-built, taken over, or inherited �
 
 ## Steps
 
-### Phase 1 — Codebase Analysis (4 parallel agents)
+### Phase 0 — Project Type Detection
 
-1. Ask: "What is the project name? And what folder are we analyzing? (default: current directory)"
+1. Ask in a single message:
+   ```
+   A few questions before we start:
+
+   1. Project name?
+   2. Single app or multiple apps (workspace)?
+      → Single: one codebase, one deployable
+      → Workspace: multiple apps in subdirectories (e.g. web-app/, admin/, mobile/)
+   3. Root folder to analyze? (default: current directory)
+   ```
+   Wait for answers.
+
+   **If workspace** → skip to **Workspace Mode** section below.
+   **If single app** → continue with Phase 1.
 
 2. Launch all 4 agents simultaneously:
 
@@ -156,3 +169,114 @@ Analyzes an existing codebase — whether half-built, taken over, or inherited �
    → `/test`   — run quality checks on existing code first
    ```
 9. Ask: "Which step do you want to take next?"
+
+---
+
+## Workspace Mode
+
+> Use this path when the user has multiple apps in subdirectories.
+
+### Phase 1 — App Discovery
+
+W1. Ask:
+   ```
+   Tell me about the apps in this workspace:
+
+   1. Workspace name? (e.g. my-saas)
+   2. List the apps and their folders:
+      - App name → folder path (e.g. web-app → ./web, admin → ./admin)
+   3. Is there a shared folder (shared/, packages/, libs/)? If yes, which one?
+   ```
+   Wait for answers.
+
+W2. For each app, launch 4 parallel analysis agents (same as Phase 1 above):
+   - Tech Stack, Architecture, Quality, Core Concerns
+   - Output to `.planning/codebase/{app-name}/01-tech-stack.md` ... `04-core-concerns.md`
+   - Run all apps in parallel if possible, otherwise sequentially
+
+W3. Also analyze the shared folder if present:
+   - Output to `.planning/codebase/shared/`
+
+W4. Generate a per-app summary and a workspace-level summary:
+   - `.planning/codebase/{app-name}/05-summary.md` — per app
+   - `.planning/codebase/00-workspace-summary.md`:
+     ```markdown
+     # Workspace Summary — {workspace-name}
+     **Apps**: {list}
+     **Shared code**: {yes/no, what}
+     **Common tech**: {shared stack across apps}
+
+     ## Per-App Status
+     | App | Stack | Completeness | Phase |
+     |-----|-------|-------------|-------|
+     | {app} | {stack} | ~{X}% | Phase {N} |
+
+     ## Cross-App Risks
+     {shared DB? auth shared? API dependencies between apps?}
+     ```
+
+### Phase 2 — Workspace Integration
+
+W5. Ask:
+   ```
+   ✅ Analysis complete for all {N} apps.
+
+   For each app, do you want to:
+   → Continue: map current state, generate remaining tasks
+   → Restart: set up fresh (keep or clear existing code)
+
+   Answer per app, or say "continue all" / "restart all".
+   ```
+   Wait for answers.
+
+W6. Create workspace folder structure:
+   - `projects/{workspace-name}/WORKSPACE.md` — app manifest table
+   - `projects/{workspace-name}/DESIGN-SYSTEM.md` — fill from any shared design tokens found
+   - `projects/{workspace-name}/DECISIONS.md`
+   - `projects/{workspace-name}/BACKLOG.md`
+
+W7. For each app — generate project files under `projects/{workspace-name}/apps/{app-name}/`:
+   - `REQUIREMENTS.md` — from tech stack analysis
+   - `STRUCTURE.md` — from architecture analysis
+   - `DESIGN.md` — from UI analysis (or mark PENDING)
+   - `STATE.md` — completeness assessment
+   - `PLAN.md` — remaining tasks only, prioritized
+
+   Fill `WORKSPACE.md` apps table with detected phase and status for each app.
+
+W8. Set the first app (or most active one) as active. Write `.state/ACTIVE-PROJECT.md`:
+   ```markdown
+   # Active Project
+   - **Type**: workspace
+   - **Workspace**: {workspace-name}
+   - **Path**: projects/{workspace-name}
+   - **Active App**: {first-app}
+   - **App Path**: projects/{workspace-name}/apps/{first-app}
+   - **App Phase**: {detected phase}
+   - **Last worked on**: {date}
+   - **Source**: imported from existing codebase
+   - **Next task**: {first task from PLAN.md}
+   ```
+
+### Phase 3 — Workspace Handoff
+
+W9. Report:
+   ```
+   ✅ Workspace mapped and integrated!
+
+   🗂 Workspace: {workspace-name}
+   📁 Analysis:  .planning/codebase/ — {N} apps analyzed
+   📋 Projects:  projects/{workspace-name}/apps/
+
+   ## App Status
+   | App | Stack | Done | Left |
+   |-----|-------|------|------|
+   | {app} | {stack} | {X items} | {Y items} |
+
+   ## Suggested next steps
+   → `/build`        — continue coding the active app ({first-app})
+   → `/app [name]`   — switch to a different app
+   → `/design`       — define or improve the shared design system
+   → `/test`         — run quality checks on existing code first
+   ```
+W10. Ask: "Which app do you want to start with?"

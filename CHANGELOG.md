@@ -6,6 +6,22 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.5] — 2026-04-08
+
+### Added
+
+**`/map-codebase` — Workspace mode**
+- Now asks upfront: single app or workspace (multiple apps)?
+- Workspace path: discovers all apps, runs 4 parallel analysis agents per app simultaneously
+- Analyzes shared folder if present (shared/, packages/, libs/)
+- Generates per-app summaries + a workspace-level summary in `.planning/codebase/`
+- Creates full workspace folder structure: `projects/{workspace}/apps/{app}/` for each app
+- Each app gets its own REQUIREMENTS.md, STRUCTURE.md, DESIGN.md, STATE.md, PLAN.md
+- Sets ACTIVE-PROJECT.md in workspace mode — all commands work immediately after
+- Handoff report shows per-app status table and suggested next steps
+
+---
+
 ## [1.4.4] — 2026-04-07
 
 ### Added
