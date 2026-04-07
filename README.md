@@ -49,7 +49,9 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 
 | Command | What it does |
 |---------|-------------|
-| `/new-project` | Start a new project |
+| `/new-project` | Start a new single-app project |
+| `/workspace` | Create a multi-app workspace |
+| `/app [name]` | Add a new app or switch between apps in a workspace |
 | `/brainstorm` | Analyze your idea + research the market |
 | `/requirements` | Select and lock the tech stack |
 | `/design` | Define pages, features, and visual system |
@@ -80,6 +82,15 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 /build  ← repeat until done
 /test
 /deploy
+```
+
+**Building multiple related apps together (new in v1.4):**
+```
+/workspace          ← create a workspace (e.g. my-saas)
+/brainstorm         ← plan the first app
+/build              ← build it
+/app admin-panel    ← switch to a second app
+/brainstorm         ← plan the second app independently
 ```
 
 **Returning to a project:**
@@ -115,13 +126,17 @@ Switch back            → check mission/job-001.md or tell Claude "job done"
 ateschh-kit/
 ├── CLAUDE.md              ← Main orchestration file
 ├── .claude/
-│   ├── rules/             ← 7 auto-loaded behavioral rules
+│   ├── rules/             ← 8 auto-loaded behavioral rules
 │   └── commands/          ← Slash commands (Claude Code native)
 ├── .agent/
 │   └── workflows/         ← Slash commands (Antigravity native)
 ├── agents/                ← 9 specialist agents
 ├── skills/                ← 9 reusable atomic skills
-├── templates/             ← Project file templates
+├── templates/
+│   ├── project/           ← Single-app project templates
+│   └── workspace/         ← Multi-app workspace templates
+├── design-engine/         ← Built-in UI/UX intelligence (styles, colors, fonts, UX rules)
+├── design-search.py       ← Design engine entry point
 └── mission/               ← Cross-platform job queue (gitignored)
 ```
 

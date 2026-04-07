@@ -26,6 +26,23 @@
 - Never leave STATE.md partially done
 - Unexpected end → write "INTERRUPTED" + last known state
 
+## Workspace Mode — Path Resolution
+
+When `ACTIVE-PROJECT.md` contains `- **Type**: workspace`:
+- All commands that read/write project files resolve against the **active app path**:
+  `projects/{workspace-name}/apps/{active-app}/`
+- Workspace-level files live at: `projects/{workspace-name}/`
+- Use `App Path` from ACTIVE-PROJECT.md as the base for all per-app file operations.
+- Workspace-level DESIGN-SYSTEM.md is shared across apps. Each app's DESIGN.md may extend it.
+
+## Workspace Files — `projects/{workspace-name}/`
+| File | Purpose | Locked? |
+|------|---------|---------|
+| WORKSPACE.md | App manifest + active app pointer | No |
+| DESIGN-SYSTEM.md | Shared design tokens across all apps | After /design |
+| DECISIONS.md | Workspace-level architectural decisions | No |
+| BACKLOG.md | Workspace-level future ideas | No |
+
 ## Session Log Format
 ```
 ## YYYY-MM-DD — {project-name}

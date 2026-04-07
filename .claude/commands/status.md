@@ -11,9 +11,23 @@ outputs: ["Progress report"]
 
 ## Steps
 
-1. Read `.state/ACTIVE-PROJECT.md`, `projects/{name}/STATE.md`, `projects/{name}/PLAN.md`.
-2. Count PLAN.md tasks: total, completed (checked), remaining. Calculate `{done}/{total} ({percent}%)`.
-3. Generate report:
+1. Read `.state/ACTIVE-PROJECT.md`.
+   - **If `Type == workspace`**: also read `projects/{workspace-name}/WORKSPACE.md`. Show workspace overview first:
+     ```
+     ## Workspace — {workspace-name}
+
+     | App | Phase | Status |
+     |-----|-------|--------|
+     | {app-1} (ACTIVE) | {N}/6 | {status} |
+     | {app-2}          | {N}/6 | {status} |
+
+     Active app: {app-name} — switch with `/app [name]`
+     ```
+     Then resolve `{name}` = active app, files path = `App Path`. Continue with steps below.
+   - **Single-app**: resolve `{name}` = project name. Continue normally.
+2. Read `{path}/STATE.md` and `{path}/PLAN.md`.
+3. Count PLAN.md tasks: total, completed (checked), remaining. Calculate `{done}/{total} ({percent}%)`.
+4. Generate report:
    ```
    ## Project Status — {name}
    📅 Last active: {date}

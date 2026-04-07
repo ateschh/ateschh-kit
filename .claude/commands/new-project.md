@@ -12,7 +12,8 @@ outputs: ["projects/{name}/ folder", "Updated ACTIVE-PROJECT.md"]
 ## Steps
 
 1. Read `.state/ACTIVE-PROJECT.md`:
-   - Active project found → "You're working on {project}. Finish it first (`/finish`) or archive it. Continue?"
+   - Active workspace found (`Type == workspace`) → "You're working on workspace '{workspace-name}'. Use `/app` to add a new app to it, or `/finish` to close the workspace first."
+   - Active single-app project found → "You're working on '{project}'. Finish it first (`/finish`) or archive it. Continue?"
    - No active project → proceed
 2. Ask:
    ```

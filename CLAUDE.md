@@ -31,6 +31,8 @@ If no active project:
 | Command | What it does | Workflow |
 |---------|-------------|---------|
 | `/new-project` | Start a new project | .claude/commands/new-project.md |
+| `/workspace` | Create a multi-app workspace | .claude/commands/workspace.md |
+| `/app [name]` | Add or switch apps in a workspace | .claude/commands/app.md |
 | `/resume` | Continue where you left off | .claude/commands/resume.md |
 | `/brainstorm` | Idea analysis + market research | .claude/commands/brainstorm.md |
 | `/requirements` | Define and lock tech stack | .claude/commands/requirements.md |
@@ -150,6 +152,8 @@ ATESCHH-KIT/
 ├── skills/                ← Skill definitions
 ├── .claude/commands/      ← Slash command logic
 ├── context-agent/         ← Context management
+├── design-engine/         ← Built-in design intelligence (styles, colors, fonts, UX rules)
+├── design-search.py       ← Design engine entry point
 ├── .state/                ← System state (gitignored)
 ├── templates/             ← Project templates
 ├── projects/              ← Active projects (gitignored)

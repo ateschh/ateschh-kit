@@ -10,7 +10,9 @@ skills: ["idea-analysis", "market-research"]
 
 ## Steps
 
-1. Read `projects/{name}/STATE.md` — confirm Phase 1.
+> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, resolve `{name}` = active app and use `App Path` for all file operations instead of `projects/{name}/`.
+
+1. Read `{path}/STATE.md` — confirm Phase 1. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
 2. Ask user to describe their idea freely. Then pick 3–5 follow-up questions specific to this idea (pick from: primary user & pain, geography/market, business model, hard constraints, success in 6 months, prior attempts). Send all in one message. Wait for answers.
 3. Read `agents/idea-analyst.md` — analyze with user's idea + answers. Present findings, ask for confirmation.
 4. Read `agents/market-researcher.md` — research competitors and gaps.

@@ -11,9 +11,12 @@ outputs: ["ACTIVE_CONTEXT.md", "sessions/session-NNN.md", "MEMORY.md updated"]
 
 ## Steps
 
-1. Read `.state/ACTIVE-PROJECT.md`, `projects/{name}/STATE.md`, `projects/{name}/PLAN.md`.
-2. Count files in `projects/{name}/sessions/` → next session is session-{NNN}.md.
-3. Create `projects/{name}/sessions/session-{NNN}.md`:
+1. Read `.state/ACTIVE-PROJECT.md`.
+   - **If `Type == workspace`**: resolve `{name}` = active app, `{path}` = `App Path` (e.g., `projects/{workspace}/apps/{app}/`). Display name = `{workspace-name} / {app-name}`.
+   - **Single-app**: resolve `{name}` = project name, `{path}` = `projects/{name}/`.
+   Read `{path}/STATE.md` and `{path}/PLAN.md`.
+2. Count files in `{path}/sessions/` → next session is session-{NNN}.md.
+3. Create `{path}/sessions/session-{NNN}.md`:
    ```markdown
    # Session {NNN} — {date}
    ## What was done this session
@@ -31,7 +34,7 @@ outputs: ["ACTIVE_CONTEXT.md", "sessions/session-NNN.md", "MEMORY.md updated"]
 4. Write `.state/ACTIVE_CONTEXT.md` (1-page summary):
    ```markdown
    # Active Context — {date}
-   **Project**: {name}
+   **Project**: {name}  (workspace: {workspace-name} / app: {app-name} if workspace mode)
    **Phase**: {N}/6
    **Status**: {brief description}
    ## What's done
@@ -41,9 +44,10 @@ outputs: ["ACTIVE_CONTEXT.md", "sessions/session-NNN.md", "MEMORY.md updated"]
    ## Key decisions made
    {brief list}
    ## Where to find things
-   - Main code: projects/{name}/src/
-   - Requirements: projects/{name}/REQUIREMENTS.md
-   - Design system: projects/{name}/DESIGN.md
+   - Main code: {path}/src/
+   - Requirements: {path}/REQUIREMENTS.md
+   - Design system: {path}/DESIGN.md
+   {if workspace: - Shared design system: projects/{workspace-name}/DESIGN-SYSTEM.md}
    ```
 5. Update MEMORY.md — add link to latest session, update current state.
 6. Append `.state/SESSION-LOG.md`:

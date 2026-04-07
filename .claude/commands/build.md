@@ -10,7 +10,9 @@ skills: ["write-code"]
 
 ## Steps
 
-1. Read: REQUIREMENTS.md → DESIGN.md → STATE.md → PLAN.md.
+> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`.
+
+1. Read: `{path}/REQUIREMENTS.md` → `{path}/DESIGN.md` → `{path}/STATE.md` → `{path}/PLAN.md`. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
 2. Show current task:
 ```
 🎯 Task: {name}
@@ -19,6 +21,8 @@ skills: ["write-code"]
 Proceed?
 ```
 3. Read `agents/coder.md` — implement the task (exact scope, no extras, REQUIREMENTS+DESIGN constraints, Context7 for API verification).
+   - Before writing UI code: read `projects/{name}/design-system/pages/{page}.md` if it exists, else `design-system/MASTER.md`
+   - For component-specific guidance: `python3 design-search.py "<component>" --domain ux`
 4. L1+L2 check:
    - [ ] Build passes, no TS errors, no lint errors
    - [ ] Feature works, no console errors, core flow works

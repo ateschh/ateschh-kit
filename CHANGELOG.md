@@ -6,6 +6,39 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.0] — 2026-04-07
+
+### Added
+
+**Multi-App Workspace Support**
+- `/workspace` — Create a workspace that holds multiple related apps (e.g. main app + admin panel)
+- `/app [name]` — Add a new app to the active workspace or switch between existing apps
+- `templates/workspace/WORKSPACE.md` — Workspace manifest template
+- `templates/workspace/DESIGN-SYSTEM.md` — Shared design system template for all apps in a workspace
+- Workspace mode: all phase commands (`/brainstorm`, `/requirements`, `/design`, `/build`, `/test`, `/deploy`) automatically resolve paths to the active app
+- `/status` shows workspace overview (all apps + phases) before per-app detail
+- `/save` and `/resume` are workspace-aware — session files are saved per-app, other apps listed on resume
+- `/finish` checks all apps are at Phase 6 before archiving the workspace
+
+**Built-in UI/UX Design Engine**
+- `design-engine/` — Embedded via git submodule; Python BM25 search engine with CSV databases (styles, colors, typography, UX guidelines, charts)
+- `design-search.py` — Wrapper script at repo root; no external install needed
+- `.claude/rules/08-ui-design.md` — Native rule that governs when and how the design engine is used
+- `/design` now auto-generates `projects/{name}/design-system/MASTER.md` after DESIGN.md approval
+- `/build` reads design-system files before writing UI code
+- Pre-delivery checklist (L2 gate): contrast, touch targets, spacing rhythm, animations, dark mode, etc.
+- Supported domains: `style`, `color`, `typography`, `ux`, `product`, `landing`, `chart`
+- Supported stacks: `react`, `nextjs`, `vue`, `svelte`, `react-native`, `flutter`, `swiftui`, `shadcn`, and more
+
+### Changed
+- `CLAUDE.md` — Added `/workspace` and `/app` to the slash commands table; updated file system diagram
+- `.claude/rules/04-completion-lock.md` — Added Workspace Mode section
+- `.claude/rules/05-state-management.md` — Added workspace path resolution rules and workspace file table
+- `/new-project` — Now warns correctly when a workspace is active
+- All phase commands — Added workspace mode note at the top of each
+
+---
+
 ## [1.0.0] — 2026-04-05
 
 ### Added
