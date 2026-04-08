@@ -6,6 +6,23 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [1.4.7] — 2026-04-08
+
+### Added
+
+**Context7 MCP — required for `/requirements`**
+- `/requirements` now verifies Context7 MCP is available before proceeding
+- If not installed: stops and shows install instructions (`npx -y @upstash/context7-mcp`)
+- For each technology in the proposed stack: fetches current stable version, breaking changes, deprecation notices via Context7
+- REQUIREMENTS.md now includes verification date
+- README updated with Context7 install instructions
+
+**`/brainstorm` — listen first, ask second**
+- Claude now asks the user to describe their idea freely before asking any questions
+- Follow-up questions are generated based on what's missing from the description — not a fixed list
+
+---
+
 ## [1.4.5] — 2026-04-08
 
 ### Added
