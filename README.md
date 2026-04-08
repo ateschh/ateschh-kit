@@ -150,6 +150,33 @@ ateschh-kit/
 
 ---
 
+## Requirements
+
+### Context7 MCP (required for `/requirements`)
+
+`/requirements` uses [Context7](https://context7.com) to fetch up-to-date documentation for every technology in your stack — so version decisions are based on current reality, not outdated training data.
+
+**Install:**
+```bash
+npx -y @upstash/context7-mcp
+```
+
+Or add to your MCP config (`claude_desktop_config.json` / `.mcp.json`):
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+> If Context7 is not available when you run `/requirements`, the system will stop and show you the install instructions.
+
+---
+
 ## Supported Platforms
 
 | Platform | Slash Commands | Status |
