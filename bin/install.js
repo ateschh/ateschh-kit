@@ -67,6 +67,12 @@ function copySystemFiles(kitDir, targetDir) {
 
   info('Copying AGENTS.md (for OpenCode) ...')
   copyFile(path.join(kitDir, 'AGENTS.md'), path.join(targetDir, 'AGENTS.md'))
+
+  info('Copying design-engine/ ...')
+  copyDir(path.join(kitDir, 'design-engine'), path.join(targetDir, 'design-engine'))
+
+  info('Copying design-search.py ...')
+  copyFile(path.join(kitDir, 'design-search.py'), path.join(targetDir, 'design-search.py'))
 }
 
 async function main() {
