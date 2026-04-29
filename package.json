@@ -1,6 +1,6 @@
 {
   "name": "ateschh-kit",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A structured AI development system for Claude Code, Antigravity, and OpenCode. Real subagent delegation, lean save/resume, polish loop, integrated Graphify + MemPalace + Caveman.",
   "keywords": [
     "claude",
