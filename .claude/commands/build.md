@@ -40,6 +40,17 @@ Active PLAN file:
 
 Read `STATE.wireframe_status`. If `pending` → exit with guidance. Else continue.
 
+### 1b. Graphify auto-init (first /build only)
+
+Check `{path}/graphify-out/graph.json`. If absent AND any code files exist under `{path}` (`*.ts`, `*.tsx`, `*.py`, `*.js`, `*.jsx`, `*.go`, `*.rs`, `*.java`, `*.swift`, `*.kt`):
+
+1. If `{path}/.git/` absent → run `git init && git add . && git commit -m "init: pre-build baseline"` inside `{path}`.
+2. Run `graphify update {path}`.
+3. Run `graphify hook install` (cwd = `{path}`).
+4. Append SESSION-LOG: `graphify init. nodes/edges/communities recorded.`
+
+Skip silently if graph already exists. User does not need to remember — first `/build` bootstraps.
+
 ### 2. Pick task(s)
 
 Parse active PLAN file. Filter to `status: pending` tasks.
