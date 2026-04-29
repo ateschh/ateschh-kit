@@ -1,56 +1,75 @@
 ---
-command: "/design"
-description: "Defines UI theme and page structure. Locks DESIGN.md and STRUCTURE.md."
-phase: "3"
-agents: ["architect", "designer"]
-skills: ["architecture-design"]
+command: /design
+description: Defines visual system + page structure. Locks DESIGN.md, design-system/MASTER.md, STRUCTURE.md, PLAN.md.
+phase: design
+agents: [architect, designer]
+skills: [architecture-design]
 ---
 
 # /design
 
+## Preconditions
+
+- `STATE.phase` is `requirements` (i.e. `/requirements` is locked).
+- `{path}/REQUIREMENTS.md` exists with `Status: LOCKED`.
+
+If a precondition fails: tell the user which prior phase to run and exit.
+
+## Path resolution
+
+- Standalone project: `{path} = projects/{name}/`
+- Workspace app: `{path} = projects/{workspace-name}/apps/{app}/` (resolve `App Path` from `WORKSPACE.md`)
+
+In workspace mode, also reference `projects/{workspace-name}/DESIGN-SYSTEM.md` for shared tokens.
+
 ## Steps
 
-> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`. Also check `projects/{workspace-name}/DESIGN-SYSTEM.md` for shared design tokens.
+### Part A — Visual system
 
-1. Read `{path}/STATE.md` — confirm Phase 2 complete. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
+1. Ask 2–3 targeted visual-direction questions in one message: mood (minimal / bold / playful / professional), apps/sites admired, brand colors or fonts. Wait for answers.
 
-### Part A — Theme & Visual Language
+2. Spawn `designer` via `Task(subagent_type: "designer", ...)`. Provide:
+   - User answers from step 1.
+   - Outputs of `idea-analyst` and `market-researcher` (from `/brainstorm` artefacts).
+   - Path to write to: `{path}`.
 
-2. Ask 2–3 targeted questions about visual direction (one message): UI mood (minimal/bold/playful/professional), any apps/sites they admire visually, brand colors or fonts if any. Wait for answers.
-3. Read `agents/designer.md` — propose a design system based on answers AND brainstorm/market research findings:
-   - 2–3 theme options with names, mood descriptions, color palette preview, font pairing
-   - Example: "Option 1 — Clean Pro: neutral greys, Inter font, card-based layout. Used by: Linear, Notion."
-   - Present options, ask user to pick or mix. Wait for approval.
-4. Run the design engine with the chosen theme:
-   ```bash
-   python3 design-search.py "<product_type> <style_keywords>" --design-system --persist -p "{Project Name}"
-   ```
-   Creates `{path}/design-system/MASTER.md`.
-5. Lock `{path}/DESIGN.md` — status: LOCKED ✅.
+3. Designer proposes 2–3 theme options. User picks or mixes.
 
-### Part B — Page Structure
+4. Designer:
+   - Writes `{path}/DESIGN.md` (high-level decisions, locked).
+   - Runs `python design-search.py "<product_type> <style_keywords>" --design-system --persist -p "{Project Name}"` to generate `{path}/design-system/MASTER.md`.
+   - If design engine unavailable: continue with `DESIGN.md` only, log warning to STATE.md.
 
-6. Read `agents/architect.md` — using brainstorm findings + market research, propose the page tree:
-   - List all pages with purpose and key features on each page
-   - Indicate navigation hierarchy (primary nav / sub-pages)
-   - Base suggestions on what competitors have — explain why each page is needed
-   - Present as a structured list, ask user to approve/modify. Wait for approval.
-7. Save `{path}/STRUCTURE.md` with approved page tree.
+### Part B — Page structure
 
-### Wrap Up
+5. Spawn `architect` via `Task(subagent_type: "architect", ...)`. Provide:
+   - DESIGN.md.
+   - Idea analysis + market research outputs.
+   - Path to write to: `{path}`.
 
-8. Generate `{path}/PLAN.md` from STRUCTURE.md — list pages/features as tasks, group in build order, estimate S/M/L per task.
-9. Update STATE.md — Phase 3 complete, next: `/wireframe` or `/build`.
-10. Confirm:
-```
-✅ Design locked!
-🎨 Theme: {theme name} — colors, fonts, components defined
-📐 Structure: {N} pages defined
-📋 Plan: {N} tasks ready
+6. Architect proposes page tree. User approves/modifies.
 
-Next options:
-  → `/wireframe` — define each page's content in detail before coding (recommended)
-  → `/build`     — start coding now
-```
+7. Architect writes:
+   - `{path}/STRUCTURE.md` (page list, navigation, data per page).
+   - `{path}/PLAN.md` (task list per `templates/project/PLAN.template.md` — id, size, description, acceptance criteria, dependencies, files touched).
 
-**Next**: `/wireframe` or `/build`
+### Wrap up
+
+8. Update `{path}/STATE.md`: `phase: design` → `phase: wireframe` (default next step). Set `wireframe_status: pending`.
+
+9. Append caveman summary to `SESSION-LOG.md` and write to MemPalace project wing.
+
+10. Confirm to user:
+    ```
+    Design locked.
+    theme: {name}
+    pages: {N}
+    plan: {N} tasks
+    next: /wireframe (recommended) or /build --skip-wireframe
+    ```
+
+## Failure modes
+
+- Design engine fails (Python missing, etc.): warn, continue without `MASTER.md`, set `STATE.design_engine_status: unavailable`.
+- User rejects all theme options: re-prompt with broader question set.
+- Architect output missing fields: refuse to lock, ask architect to retry.

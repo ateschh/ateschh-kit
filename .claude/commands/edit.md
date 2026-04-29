@@ -1,89 +1,75 @@
 ---
-command: "/edit"
-description: "Focused editing of an existing page, component, or file. For UI tweaks, copy changes, and fine-tuning."
-phase: "4+"
+command: /edit
+description: Focused edit of an existing page, component, or file. Spawn matrix decides delegation; small tweaks stay inline.
+phase: any
+agents: [coder, context-manager]
+skills: [write-code]
 ---
 
-# /edit — Edit & Refine
+# /edit
 
-## When to Use
+For tweaks to existing code: layout adjustments, copy changes, small visual fixes, single-file logic touches.
 
-When you want to improve something that already exists:
-- A page looks off and you want to adjust the layout or spacing
-- Copy needs to be changed
-- A component needs a visual tweak
-- A specific file needs a small logic change
+Not for new features (use `/build`). Not for bugs (use `/run` to repro then `/build` or spawn `debugger`).
 
-**Not for building new features** — use `/build` for that.
-**Not for bugs** — use `/quick` or `/run` for that.
+## Path resolution
 
----
+Standalone: `{path} = projects/{name}/`
+Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
 
 ## Steps
 
-### Step 1: Identify the Target
+### 1. Identify target
 
-If the user specifies a file or page → go directly.
-If not, ask:
-```
-Which page or file do you want to edit?
-(e.g. "home page", "navbar", "src/components/Card.tsx")
-```
+If user named a file or page, use it. Otherwise ask: "Which page or file?"
 
-### Step 2: Read the Target
+### 2. Recall context (lazy)
 
-Read the file(s) in full. Understand what's already there before touching anything.
+- `context-manager.recall.code <target>` → Graphify hits relevant to the target (or grep fallback).
+- Read `{path}/DESIGN.md` (small, theme constraints).
+- If touching a page, read `{path}/design-system/pages/{page}.md` (or MASTER fallback).
+- Read the target file(s) only.
 
-Also read:
-- `projects/{name}/DESIGN.md` → colors, fonts, spacing system — stay consistent
-- `projects/{name}/STRUCTURE.md` → where this page fits in the overall app
+### 3. Clarify if vague
 
-### Step 3: Understand the Request
+One question max if the request is ambiguous.
 
-Ask one clarifying question if the request is vague:
-```
-What specifically should change?
-(e.g. "the button is too large", "the title font should be smaller", "remove the sidebar on mobile")
-```
-
-If the request is clear, proceed without asking.
-
-### Step 4: Show a Plan
-
-For anything touching more than 1 file or more than ~10 lines:
-```
-Edit Plan:
-📄 File: {file}
-
-Changes:
-- {change 1}
-- {change 2}
-
-Design system check: ✅ consistent with DESIGN.md
-
-Proceed?
-```
-
-For tiny edits (1–3 lines), skip the plan and just do it.
-
-### Step 5: Make the Changes
-
-Edit the file(s). Stay within the design system — don't introduce new colors, fonts, or spacing values not in DESIGN.md.
-
-### Step 6: L1 + L2 Check
-
-- [ ] No build/type/lint errors
-- [ ] The change looks and works as intended
-- [ ] Nothing else broke
-
-### Step 7: Confirm
+### 4. Spawn decision (per Rule 11)
 
 ```
-✅ Done!
-
-📄 {file} updated
-Changes: {brief description}
-
-Want to run the app to see it live? → /run
-Want to keep editing? → /edit {next target}
+spawn = (files_touched > 1)
+     or (lines_changed_estimate > 20)
+     or (touches multiple components / shared state)
 ```
+
+If spawn = false → orchestrator edits inline (Edit tool), runs L1+L2, done.
+If spawn = true → spawn `coder` with a caveman task body that names the target, the change, and constraints (no scope creep, design-system tokens only).
+
+### 5. Run L1 + L2
+
+After edit (inline or via coder):
+- L1: `npm run build`, typecheck, lint.
+- L2: smoke test the affected feature.
+
+If L2 fails → spawn `debugger`.
+
+### 6. Wrap up
+
+- `context-manager.write.session-summary` (caveman): `edit {target}. {1-line caveman}.`
+- Append SESSION-LOG.md (caveman).
+- If non-trivial decision was made (e.g. extracted a shared component), append `DECISIONS.md` via `context-manager.write.decision`.
+
+## Failure modes
+
+- Target unclear → exit, ask.
+- Edit affects locked files (REQUIREMENTS, DESIGN, etc.) → refuse. Suggest `/polish` for sanctioned unlock.
+- L2 fails twice → escalate to user.
+
+## Anti-Patterns (Forbidden)
+- Refactor the surrounding file beyond the edit scope.
+- Introduce design tokens not in DESIGN.md / MASTER.md.
+- Spawn `coder` for a 1–3 line change that the orchestrator could do inline.
+
+## Next
+
+`/run`, `/test`, or another `/edit`.

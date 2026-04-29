@@ -1,38 +1,89 @@
 ---
-command: "/deploy"
-description: "Deploys the application to production. Uses MCP tools."
-phase: "6"
-agents: ["deployer"]
-skills: ["publish"]
-outputs: ["Live URL", "Updated STATE.md", "Deployment log"]
+command: /deploy
+description: Spawns deployer for the deploy_target in REQUIREMENTS.md. Verifies post-deploy and updates STATE.md.
+phase: deploy-ready
+agents: [deployer, context-manager]
+skills: [publish]
+outputs: [Live URL, STATE.md updated, deployment log appended]
 ---
 
 # /deploy
 
+## Preconditions
+
+- `STATE.phase` is `deploy-ready`.
+- Latest `tester` and `qa-reviewer` outputs both `ready_for_deploy: yes`.
+- `REQUIREMENTS.md` has `deploy_target` set.
+
+## Path resolution
+
+Standalone: `{path} = projects/{name}/`
+Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`. Deploy the active app only.
+
 ## Steps
 
-> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`. Deploy the active app only; switch with `/app [name]` to deploy others.
+### 1. Pre-flight
 
-1. Pre-deploy checklist:
-   - [ ] L1–L4 all pass
-   - [ ] `.env` variables correct (not test values)
-   - [ ] Deploy target in REQUIREMENTS.md
-   - [ ] No hardcoded localhost URLs
-2. Read `projects/{name}/REQUIREMENTS.md` → identify deploy target.
-3. Read `agents/deployer.md` → execute target-specific deploy:
-   - **Vercel/Next.js**: `vercel --prod` or Vercel MCP, set env vars, verify URL
-   - **Cloudflare Workers**: Cloudflare MCP, set KV/D1/R2 bindings, verify API
-   - **Expo**: `eas build` + store submit or `eas update` for OTA
-   - **Supabase**: run migrations via MCP, verify RLS + anon key
-   - **Firebase**: Firebase MCP deploy hosting/functions, verify URL
-4. Post-deploy: open live URL, run core user flow smoke test, confirm no 500 errors.
-5. Update STATE.md — Phase 6 complete, add live URL.
-6. Confirm:
+- Read `REQUIREMENTS.md`. Confirm `deploy_target` value.
+- If `deploy_target == other` → emit a manual checklist, do not auto-deploy. Wait for user to confirm a manual step has been completed and provide a URL.
+- Confirm `STATE.phase == deploy-ready` and last test report shows L1–L4 clean.
+- Verify env vars: read `.env.example` and confirm production equivalents exist (do not read the production secret values; just confirm presence).
+
+### 2. Spawn deployer
+
+`Task(subagent_type: "deployer", ...)`. Caveman task body:
+
 ```
-🚀 Deployed!
-🌐 Live URL: {url}
-📅 Deployed: {date}
-Run `/finish` to archive this project.
+deploy. target {deploy_target}. follow playbook. run pre-deploy checklist. execute. verify post-deploy. report per OUTPUT-SCHEMA.
+
+deploy_target: {value}
+{path}: {project path}
+commit: {current head sha}
+env_var_inventory: {list from .env.example}
 ```
 
-**Next**: `/finish`
+### 3. Parse return
+
+- `status: ok` and `custom.post_deploy_checks: pass` → success.
+- `status: partial` with non-blocker issues (e.g. minor warnings) → success with notes.
+- `status: failed` → preserve any deploy log, surface error + remediation. Do NOT advance phase.
+- `deploy_target == other` and `custom.url == null` → manual mode; ask user to paste the live URL once they confirm deploy.
+
+### 4. Wrap up on success
+
+- Append deployment block to `{path}/STATE.md`:
+  ```yaml
+  deployments:
+    - date: {date}
+      platform: {value}
+      url: {url}
+      commit: {sha}
+      status: live
+  ```
+- Update `STATE.phase: deployed`.
+- `context-manager.write.session-summary`:
+  ```
+  deploy ok. {platform}. {url}. commit {sha-short}. all checks pass.
+  ```
+- Append `SESSION-LOG.md` (caveman).
+- Append `DECISIONS.md` (normal English) if deployer made non-trivial decisions during deploy.
+
+### 5. Confirm
+
+Reply normal English:
+```
+Deployed.
+URL: {url}
+Platform: {platform}
+Run /finish to archive, or /polish to iterate.
+```
+
+## Failure modes
+
+- `deployer` returns `failed` with build error → surface, do not retry. Likely needs `/build` fix.
+- Network / DNS / quota → `deployer` retries once with backoff per Rule 09. If still failing, return `failed`.
+- Post-deploy smoke test fails → `deployer` flags it; user decides rollback vs forward-fix.
+
+## Next
+
+`/finish` or `/polish`.

@@ -1,94 +1,88 @@
-# Project State — {Project Name}
-
-**Phase**: {1-6} / 6
-**Status**: {IN PROGRESS / COMPLETE / BLOCKED}
-**Last updated**: {YYYY-MM-DD}
-**Started**: {YYYY-MM-DD}
-
+---
+kit_version: 2.0.0
+project: {project-name}
+type: standalone
+phase: brainstorm
+wireframe_status: pending
+iteration_count: 0
+last_session_id: null
+interrupted: false
+current_wave: 0
+running_agents: []
+parallel_concurrency: 3
+last_updated: {YYYY-MM-DD}
+started: {YYYY-MM-DD}
 ---
 
-## Phase Progress
+# Project State — {project-name}
 
-| Phase | Name | Status |
-|-------|------|--------|
-| 1 | Idea & Research | ⬜ Not started |
-| 2 | Requirements | ⬜ Not started |
-| 3 | Design | ⬜ Not started |
-| 4 | Build | ⬜ Not started |
-| 5 | Test | ⬜ Not started |
-| 6 | Deploy | ⬜ Not started |
+`phase` valid values: `brainstorm | requirements | design | wireframe | build | test | deploy-ready | polish-N | deployed`.
 
----
+`wireframe_status` valid values: `pending | done | skipped | ai-generated`.
 
-## Phase 1 — Idea & Research
+## Phase Checklist
 
-- [ ] Idea analysis complete (idea-analyst)
-- [ ] Market research complete (market-researcher)
-- [ ] Idea approved by user
+### brainstorm
+- [ ] idea analysis (idea-analyst)
+- [ ] market research (market-researcher)
+- [ ] user approves
 
----
+### requirements
+- [ ] stack proposed (requirements-expert)
+- [ ] stack approved
+- [ ] REQUIREMENTS.md locked
+- [ ] deploy_target set
 
-## Phase 2 — Requirements
+### design
+- [ ] visual system locked (DESIGN.md)
+- [ ] design-system/MASTER.md generated (or warned absent)
+- [ ] structure locked (STRUCTURE.md)
+- [ ] PLAN.md generated
 
-- [ ] Tech stack proposed
-- [ ] Tech stack approved
-- [ ] REQUIREMENTS.md locked ✅
+### wireframe
+- [ ] WIREFRAMES.md locked (or wireframe_status: skipped | ai-generated)
 
----
+### build
+- [ ] tasks listed in PLAN.md
+- next task: {T-id} {description}
 
-## Phase 3 — Design
+### test
+- [ ] L1 pass (build + types + lint)
+- [ ] L2 pass (feature functionality)
+- [ ] L3 pass (integration)
+- [ ] L4 pass (qa-reviewer)
 
-- [ ] App structure defined (STRUCTURE.md)
-- [ ] Design system created (DESIGN.md)
-- [ ] Both approved by user
-- [ ] PLAN.md created
+### deploy-ready
+- user choice: deploy or polish
 
----
+### polish-N (when active)
+- iteration: {N}
+- delta plan: polish/iteration-{N}/PLAN.md
 
-## Phase 4 — Build
-
-<!-- Tasks from PLAN.md will be listed here as they are worked on -->
-
-- [ ] Project initialized
-- [ ] Dependencies installed
-
----
-
-## Phase 5 — Test
-
-- [ ] L1 passed (build + types + lint)
-- [ ] L2 passed (feature functionality)
-- [ ] L3 passed (integration)
-- [ ] L4 passed (quality)
-
----
-
-## Phase 6 — Deploy
-
-- [ ] Deployed to production
-- [ ] Live URL verified
-- [ ] Live URL: {url}
-
----
+### deployed
+- url: {url}
+- date: {date}
+- platform: {platform}
+- commit: {hash}
 
 ## Current Task
 
-**Next**: {describe the very next thing to do}
-
----
+next: {describe the very next concrete action}
 
 ## Last Verification
 
 ```
-Date: {date}
-L1: {✅ / ❌}
-L2: {✅ / ❌}
-L3: {✅ / ❌ / (not yet)}
-L4: {✅ / ❌ / (not yet)}
+date: {date}
+L1: pass | fail | n/a
+L2: pass | fail | n/a
+L3: pass | fail | n/a
+L4: pass | fail | n/a
 ```
-
----
 
 ## Blockers
 
-{None / describe any blocking issue}
+{none | description}
+
+## Design Engine Status
+
+{ok | unavailable: reason}

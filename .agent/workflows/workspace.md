@@ -1,86 +1,121 @@
 ---
-command: "/workspace"
-description: "Creates a new workspace for developing multiple related apps together."
-phase: "0"
+command: /workspace
+description: Creates a new workspace with shared design system and one or more apps. Each app gets a v2.0 STATE schema and .kit-version stamp.
+phase: start
 agents: []
 skills: []
+outputs: [projects/{workspace-name}/, ACTIVE-PROJECT.md (Type workspace)]
 ---
 
 # /workspace
 
+A workspace groups related apps under one project root with a shared design system and decision log.
+
+## Preconditions
+
+Read `.state/ACTIVE-PROJECT.md`:
+- Active workspace → "Already in workspace '{workspace}'. Use `/app` to add an app, or `/finish` to close first."
+- Active standalone → "Active standalone project '{name}'. Run `/finish` first."
+- None → proceed.
+
 ## Steps
 
-1. Read `.state/ACTIVE-PROJECT.md`. If an active project already exists:
-   - If `Type == workspace`: "You're already working on workspace '{workspace-name}'. Use `/app` to add a new app, or `/finish` to complete it first."
-   - If single-app project: "You're working on project '{name}'. Run `/finish` to archive it before starting a workspace."
-   - Stop and wait for user.
+### 1. Capture inputs (one message)
 
-2. Ask all questions in a single message:
-   ```
-   Let's set up your workspace. Answer these:
+```
+Workspace setup:
+1. Workspace name? (kebab-case)
+2. What this workspace builds? (one sentence)
+3. First app name?
+4. What does the first app do?
+5. Add a second app now? (name + description, or "no")
+   (More can be added later with /app)
+```
 
-   1. Workspace name? (lowercase, no spaces — e.g. my-saas)
-   2. What does this workspace build? (one sentence)
-   3. First app name? (e.g. main-app, web-app)
-   4. What does the first app do?
-   5. Add a second app now? If yes, give its name and what it does.
-      (You can always add more later with /app)
-   ```
-   Wait for all answers.
+Wait for all answers.
 
-3. Create workspace folder structure:
-   - Create `projects/{workspace-name}/`
-   - Copy `templates/workspace/WORKSPACE.md` → fill: workspace name, description, date, first app name and description
-   - Copy `templates/workspace/DESIGN-SYSTEM.md` → fill workspace name
-   - Create `projects/{workspace-name}/DECISIONS.md` (empty with `# Decisions — {workspace-name}` header)
-   - Create `projects/{workspace-name}/BACKLOG.md` (empty with `# Backlog — {workspace-name}` header)
-   - Create `projects/{workspace-name}/sessions/` directory
-   - Create `projects/{workspace-name}/apps/` directory
+### 2. Create workspace skeleton
 
-4. For each app named in step 2, run the app creation sub-routine:
-   - Create `projects/{workspace-name}/apps/{app-name}/`
-   - Copy all files from `templates/project/` into the app folder
-   - Create `projects/{workspace-name}/apps/{app-name}/sessions/` directory
-   - Create `projects/{workspace-name}/apps/{app-name}/src/` directory
-   - Fill `STATE.md`: app name, creation date, Phase 1 IN PROGRESS
-   - Add a row to WORKSPACE.md's Apps table for this app
+```
+projects/{workspace-name}/
+  WORKSPACE.md            (from templates/workspace/, filled)
+  DESIGN-SYSTEM.md        (from templates/workspace/, filled)
+  DECISIONS.md            (header only)
+  BACKLOG.md              (header only)
+  sessions/               (empty)
+  apps/                   (empty)
+  .kit-version            ("2.0.0")
+```
 
-5. Set the first app as active:
-   - Update `Active App` field in WORKSPACE.md to the first app name
+### 3. Create each app via shared sub-routine `app.create(name, description)`
 
-6. Write `.state/ACTIVE-PROJECT.md`:
-   ```markdown
-   # Active Project
-   - **Type**: workspace
-   - **Workspace**: {workspace-name}
-   - **Path**: projects/{workspace-name}
-   - **Active App**: {first-app-name}
-   - **App Path**: projects/{workspace-name}/apps/{first-app-name}
-   - **App Phase**: 1/6
-   - **Last worked on**: {today}
-   - **Next task**: /brainstorm to start planning {first-app-name}
-   ```
+For each app declared in step 1:
 
-7. Append to `.state/SESSION-LOG.md`:
-   ```
-   ## {today} — {workspace-name}
-   - **Done**: Workspace created with {N} app(s): {app-list}
-   - **Status**: Workspace ready, active app: {first-app-name}
-   - **Next**: /brainstorm
-   ```
+```
+projects/{workspace-name}/apps/{app}/
+  REQUIREMENTS.md   (template, unfilled, kit_version: 2.0.0)
+  DESIGN.md         (template)
+  STRUCTURE.md      (template)
+  PLAN.md           (template)
+  STATE.md          (template, frontmatter populated:
+                     kit_version 2.0.0, type: workspace-app, phase: brainstorm,
+                     wireframe_status: pending, iteration_count: 0)
+  DECISIONS.md      (header)
+  BACKLOG.md        (empty)
+  sessions/         (empty)
+  src/              (empty)
+  .context7-cache/  (empty)
+  .wip/             (empty)
+  .kit-version      ("2.0.0")
+```
 
-8. Confirm:
-   ```
-   ✅ Workspace "{workspace-name}" created!
+Append a row to `WORKSPACE.md` Apps table.
 
-   Apps:
-   {for each app: - {app-name}: {description}}
+### 4. Set first app active
 
-   Active app: {first-app-name}
-   Path: projects/{workspace-name}/
+`WORKSPACE.md`:
+```yaml
+active_app: {first-app-name}
+```
 
-   Next: Run `/brainstorm` to start planning {first-app-name}.
-   Switch apps anytime with `/app [name]`.
-   ```
+### 5. Write ACTIVE-PROJECT.md
 
-**Next**: `/brainstorm`
+```markdown
+# Active Project
+
+- Type: workspace
+- Workspace: {workspace-name}
+- Path: projects/{workspace-name}
+- Active app: {first-app-name}
+- App path: projects/{workspace-name}/apps/{first-app-name}
+- App phase: brainstorm
+- Started: {today}
+- Next: /brainstorm
+```
+
+### 6. Append SESSION-LOG.md (caveman)
+
+```
+{ISO timestamp} workspace {workspace-name} created. apps: {comma-sep}. active: {first}.
+```
+
+### 7. Confirm (normal English)
+
+```
+Workspace {workspace-name} created.
+Apps: {list}
+Active app: {first-app-name}
+Run /brainstorm to start planning the active app.
+Switch apps with /app <name>.
+```
+
+## Anti-Patterns (Forbidden)
+
+- Mix app names with the workspace name (collision risk).
+- Skip writing `.kit-version` stamps (Phase 7 migration relies on them).
+- Set `active_app` without writing it to `WORKSPACE.md`.
+- Treat the workspace as a single project for `/build` purposes — `/build` always operates on the active app.
+
+## Next
+
+`/brainstorm` for the active app.

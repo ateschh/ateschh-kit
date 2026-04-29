@@ -1,17 +1,26 @@
 ---
-command: "/map-codebase"
-description: "Analyzes an existing codebase and integrates it into the ateschh-kit workflow."
-phase: "pre-start"
-agents: ["architect", "requirements-expert", "tester", "coder"]
+command: /map-codebase
+description: Analyses an existing codebase. Prefers Graphify for structural extraction; falls back to 4-agent parallel analysis. Integrates the project into the kit workflow.
+phase: pre-start
+agents: [architect, requirements-expert, tester, context-manager]
 skills: []
-outputs: [".planning/codebase/ (7 files)", "REQUIREMENTS.md", "STRUCTURE.md", "DESIGN.md", "STATE.md", "PLAN.md", "ACTIVE-PROJECT.md"]
+outputs: [.planning/codebase/, REQUIREMENTS.md, STRUCTURE.md, DESIGN.md, STATE.md, PLAN.md, ACTIVE-PROJECT.md]
 ---
 
 # /map-codebase
 
-Analyzes an existing codebase — whether half-built, taken over, or inherited — and fully integrates it into the ateschh-kit workflow. After this command, you can continue with `/build`, `/test`, or any other phase command as if the project was started here from the beginning.
+Analyses an existing codebase — half-built, taken over, or inherited — and integrates it into the kit workflow. After this command, `/build`, `/test`, or any other phase command works as if the project was started from scratch.
 
 **Does NOT modify any existing code.**
+
+## Strategy
+
+Two-tier analysis:
+
+1. **Graphify-first** (preferred). `context-manager.recall.code` builds a graph and answers: tech stack, architecture, pages, data flow, quality. Token-cheap, structural.
+2. **4-agent parallel fallback** (when Graphify unavailable). Spawns 4 `Task()` calls in parallel, one per concern: tech stack, architecture, quality, core concerns. Each writes a `.planning/codebase/0N-*.md` file.
+
+The orchestrator picks tier 1 if `npx ateschh-kit doctor` reports Graphify ok; tier 2 otherwise. Mixed mode (Graphify for code structure + an agent for quality) allowed if the orchestrator deems it useful.
 
 ## Steps
 
@@ -32,7 +41,13 @@ Analyzes an existing codebase — whether half-built, taken over, or inherited �
    **If workspace** → skip to **Workspace Mode** section below.
    **If single app** → continue with Phase 1.
 
-2. Launch all 4 agents simultaneously:
+2. **Tier 1 — Graphify** (if available)
+
+   Spawn `context-manager` (operation `recall.code`) with broad query "tech stack architecture data flow quality"; pass the project root. The returned graph nodes + relationships populate `.planning/codebase/01-tech-stack.md` through `04-core-concerns.md` directly. Skip the 4-agent fallback below.
+
+   **Tier 2 — 4-agent parallel fallback** (Graphify unavailable)
+
+   Launch all 4 agents simultaneously via 4 `Task()` calls in one message (concurrency = 4 for this command, justified by hard parallelism):
 
    **Agent 1 — Tech Stack Mapper**: reads package.json/pubspec.yaml/go.mod/requirements.txt/Cargo.toml
    - Identifies: runtime, framework + versions, all dependencies + purpose, build tools, CI/CD config

@@ -1,74 +1,110 @@
 ---
-command: "/app [name]"
-description: "Add a new app to the active workspace or switch between existing apps."
-phase: "any"
+command: /app [name]
+description: Add a new app to the active workspace, or switch active app. Uses the same scaffold sub-routine as /workspace for consistency.
+phase: any
 agents: []
 skills: []
 ---
 
-# /app [name]
+# /app
+
+Workspace-mode only. Add a new app or switch the active app pointer.
+
+## Preconditions
+
+Read `.state/ACTIVE-PROJECT.md`:
+- No active project → "No active workspace. Run `/workspace` first."
+- `Type != workspace` → "`/app` is workspace-only. Active project is standalone ('{name}'). Run `/finish` then `/workspace` to migrate."
+- Active workspace → proceed.
 
 ## Steps
 
-1. Read `.state/ACTIVE-PROJECT.md`.
-   - If no active project: "No active workspace. Run `/workspace` to create one."
-   - If `Type` is NOT `workspace`: "You're working on a single-app project ('{name}'). `/app` is only available in workspace mode. Use `/workspace` to start a multi-app workspace."
-   - Stop on error.
+### 1. Read app inventory
 
-2. Read `projects/{workspace-name}/WORKSPACE.md` to get the current app list.
+`projects/{workspace-name}/WORKSPACE.md` → list of apps + active_app pointer.
 
-3. **If `[name]` argument was provided:**
-   - Check if `projects/{workspace-name}/apps/{name}/` exists.
-     - **Exists → switch** to that app (go to step 5).
-     - **Does not exist → create** the app (go to step 4), then switch (step 5).
+### 2. Resolve target
 
-   **If no argument was provided:**
-   - Show the app list from WORKSPACE.md with phases and statuses.
-   - Ask: "Which app do you want to switch to? Or enter a new name to create one."
-   - Wait for response, then proceed as above.
+If `[name]` provided:
+- App exists → switch (step 4).
+- App does not exist → create (step 3) then switch.
 
-4. **App creation sub-routine** (only if creating a new app):
-   - Ask: "What does '{name}' do? (one sentence)"
-   - Create `projects/{workspace-name}/apps/{name}/`
-   - Copy all files from `templates/project/` into the folder
-   - Create `sessions/` and `src/` inside the app folder
-   - Fill `STATE.md`: app name, creation date, Phase 1 IN PROGRESS
-   - Add a new row to WORKSPACE.md's Apps table:
-     `| {name} | {description} | 1/6 | ⬜ Not started |`
+If no argument:
+- Show app list with phase per app (caveman row per app).
+- Ask: "Switch to which app, or enter a new name to create?"
+- Wait. Then proceed as above.
 
-5. **Switch to the app:**
-   - Update `Active App` field in `projects/{workspace-name}/WORKSPACE.md`
-   - Update `.state/ACTIVE-PROJECT.md`:
-     ```markdown
-     # Active Project
-     - **Type**: workspace
-     - **Workspace**: {workspace-name}
-     - **Path**: projects/{workspace-name}
-     - **Active App**: {name}
-     - **App Path**: projects/{workspace-name}/apps/{name}
-     - **App Phase**: {N}/6
-     - **Last worked on**: {today}
-     - **Next task**: {read from app's STATE.md}
-     ```
-   - Read the app's `STATE.md` to get current phase and next task.
+### 3. Create new app (shared sub-routine)
 
-6. Append to `.state/SESSION-LOG.md`:
-   ```
-   ## {today} — {workspace-name} / {name}
-   - **Done**: Switched active app to {name}
-   - **Status**: Phase {N}/6
-   - **Next**: {next task}
-   ```
+Same scaffold as in `/workspace` step 3:
 
-7. Confirm:
-   ```
-   ✅ Active app: {name}
-   Workspace: {workspace-name}
-   Phase: {N}/6
-   Next: {next task}
+```
+projects/{workspace-name}/apps/{name}/
+  REQUIREMENTS.md, DESIGN.md, STRUCTURE.md, PLAN.md, STATE.md (all from templates)
+  DECISIONS.md, BACKLOG.md (headers)
+  sessions/, src/, .context7-cache/, .wip/ (empty)
+  .kit-version ("2.0.0")
+```
 
-   Other apps: {list remaining apps}
-   Switch with: /app [name]
-   ```
+STATE.md frontmatter populated:
+```yaml
+kit_version: 2.0.0
+project: {name}
+type: workspace-app
+phase: brainstorm
+wireframe_status: pending
+iteration_count: 0
+parallel_concurrency: 3
+last_updated: {today}
+started: {today}
+```
 
-**Next**: `/brainstorm` (new app) or `/build` (existing app in progress)
+Append a row to `WORKSPACE.md` apps table:
+`| {name} | {description} | brainstorm | pending |`
+
+### 4. Switch active app
+
+- `WORKSPACE.md`: set `active_app: {name}`.
+- `.state/ACTIVE-PROJECT.md`:
+
+```markdown
+# Active Project
+
+- Type: workspace
+- Workspace: {workspace-name}
+- Path: projects/{workspace-name}
+- Active app: {name}
+- App path: projects/{workspace-name}/apps/{name}
+- App phase: {read from STATE.md}
+- Last worked on: {today}
+- Next: {next from STATE.md or "/brainstorm" for fresh app}
+```
+
+### 5. Append SESSION-LOG.md (caveman)
+
+```
+{ISO timestamp} app switch -> {name}. workspace {workspace-name}. phase {phase}.
+```
+
+### 6. Confirm (normal English)
+
+```
+Active app: {name}
+Workspace: {workspace-name}
+Phase: {phase}
+Next: {next task or command}
+
+Other apps: {list}.
+Switch with /app <name>.
+```
+
+## Anti-Patterns (Forbidden)
+
+- Create an app outside `apps/` (e.g. directly under workspace root).
+- Skip writing `.kit-version` for the new app (Phase 7 migration relies on it).
+- Switch active app without updating both `WORKSPACE.md` and `ACTIVE-PROJECT.md`.
+- Modify the previously active app's STATE.md as part of the switch (each app's state is independent).
+
+## Next
+
+`/brainstorm` (new app) or whatever the active app's STATE points to.

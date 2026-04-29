@@ -1,79 +1,86 @@
 ---
-command: "/requirements"
-description: "Selects and locks the tech stack."
-phase: "2"
-agents: ["requirements-expert"]
-skills: ["requirements-lock"]
+command: /requirements
+description: Selects and locks the tech stack via requirements-expert. Verifies versions through Context7 and seeds the per-library cache.
+phase: requirements
+agents: [requirements-expert]
+skills: [requirements-lock]
 ---
 
 # /requirements
 
+## Preconditions
+
+- `STATE.phase` is `requirements`.
+- `IDEA-ANALYSIS.md` and `MARKET-RESEARCH.md` exist (from `/brainstorm`).
+
+## Path resolution
+
+Standalone: `{path} = projects/{name}/`
+Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
+
 ## Steps
 
-> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`.
+### 1. Context7 detection
 
-### Context7 Check (REQUIRED — do this before anything else)
+Attempt a Context7 health call.
+- **Available** → continue normally, version verification on.
+- **Unavailable** → warn the user, offer two options:
+  - **Install**: print install snippet (`npx -y @upstash/context7-mcp` or MCP config), exit and wait for restart.
+  - **Degraded mode**: continue without verification. `requirements-expert` will lock with `context7_status: degraded`. User must accept this explicitly.
 
-1. Verify Context7 MCP is available by attempting to call it.
-   - **Available** → proceed normally.
-   - **Not available** → stop and inform the user:
-     ```
-     ⚠️ Context7 MCP is required for /requirements.
-     It fetches up-to-date documentation for every technology in your stack,
-     so version decisions are based on current reality — not outdated training data.
+### 2. Targeted questions
 
-     To install:
-     npx -y @upstash/context7-mcp
+Ask 3–5 stack-shaping questions in one message: preferred framework/language, deployment target, expected scale, existing infrastructure, team experience, hard constraints (budget, compliance, offline). Wait.
 
-     Or add to your MCP config:
-     {
-       "mcpServers": {
-         "context7": {
-           "command": "npx",
-           "args": ["-y", "@upstash/context7-mcp"]
-         }
-       }
-     }
+### 3. Spawn requirements-expert
 
-     Once installed, restart your AI tool and run /requirements again.
-     ```
-   - Do NOT proceed without Context7.
+Single `Task(subagent_type: "requirements-expert", ...)` call. Caveman task body:
 
-### Stack Selection
+```
+select stack. user idea + answers below. propose stack. verify each major lib via context7 (or degraded mode if flagged). lock REQUIREMENTS.md. seed .context7-cache/ per major lib.
 
-2. Read `{path}/STATE.md` — confirm Phase 1 complete. (`{path}` = `App Path` if workspace, else `projects/{name}/`)
-3. Ask 3–5 targeted questions in one message (pick relevant): preferred framework/language, deployment target, expected scale, existing infrastructure, team experience, hard constraints (budget, compliance, offline). Wait for answers.
-4. Read `agents/requirements-expert.md` — propose a stack based on the idea + user answers.
+idea: {one-line}
+answers: {Q&A}
+context7_status: ok | degraded
+path: {path}
+```
 
-### Context7 Verification (for each technology in the proposed stack)
+Output contract: `OUTPUT-SCHEMA.md`. Custom fields include `deploy_target`, `cache_seeded`, `major_libs_cached`.
 
-5. For each major technology in the proposed stack, use Context7 to fetch current documentation:
-   - Resolve the library ID: use `resolve-library-id` with the technology name
-   - Fetch key facts: use `get-library-docs` — focus on: current stable version, major recent changes, known breaking changes, deprecation notices
-   - If a better/newer alternative is found during research → flag it and explain why
+### 4. Parse return
 
-6. Present the verified stack:
-   ```
-   | Category | Technology | Version | Verified |
-   |----------|-----------|---------|---------|
-   | Framework | Next.js | 15.x | ✅ Context7 |
-   | Database | Supabase | latest | ✅ Context7 |
-   | ...      | ...      | ...   | ...        |
-   ```
-   Include any important notes found during Context7 research (e.g. "App Router is now default", "Prisma 6 has breaking changes from v5").
-   Ask: "Does this stack work? Once confirmed it locks."
+If `status: failed` → surface and stop, no lock.
+If `status: ok`:
+- Confirm `artifacts: [REQUIREMENTS.md]` present.
+- Confirm `deploy_target` set (not null).
+- Confirm `cache_seeded: yes` if `context7_status: ok`. If `degraded`, cache is empty — log warning.
 
-### Lock
+### 5. Wrap up
 
-7. Lock `{path}/REQUIREMENTS.md` — status: LOCKED ✅, all versions included, verification date noted.
-8. Append to `{path}/DECISIONS.md`:
-   ```
-   ## {date} — Tech Stack Locked
-   - Selected: {framework, DB, etc.}
-   - Verified via: Context7 on {date}
-   - Reason: {brief}
-   ```
-9. Update STATE.md — Phase 2 complete, next: `/design`.
-10. Confirm: "✅ Stack locked and verified. Next: `/design`"
+- Append decision to `{path}/DECISIONS.md` (normal English, not caveman):
+  ```
+  ## {date} — Tech Stack Locked
+  - Selected: {framework}, {db}, {ui}
+  - Verified via: Context7 on {date}, or degraded mode
+  - Reason: {brief}
+  ```
+- Update `{path}/STATE.md`: `phase: design`.
+- `context-manager.write.session-summary`:
+  ```
+  requirements done. stack locked. deploy {target}. cache {yes|no}. next /design.
+  ```
+- Append SESSION-LOG.md (caveman).
 
-**Next**: `/design`
+### 6. Confirm
+
+Reply normal English: "Stack locked. Run `/design` next, or `/next` for auto-pilot."
+
+## Failure modes
+
+- `requirements-expert` returns `failed` → preserve any partial proposal as draft in `{path}/.wip/requirements/`, do not overwrite REQUIREMENTS.md.
+- Context7 dies mid-task → `requirements-expert` flags `context7_status: degraded`, continues.
+- User refuses degraded mode → exit, wait for Context7 install.
+
+## Next
+
+`/design`

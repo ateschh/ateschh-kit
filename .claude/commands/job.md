@@ -1,91 +1,107 @@
 ---
-command: "/job"
-description: "Executes a cross-platform job from the mission/ folder. Usage: /job [number]"
-phase: "any"
+command: /job [number]
+description: Execute a cross-platform job (mission/job-NNN.md). For Claude Code ↔ Antigravity ↔ OpenCode handoff.
+phase: any
+agents: [coder, debugger, context-manager]
+skills: []
+outputs: [mission/job-NNN.md updated with Result section]
 ---
 
-# /job — Execute Cross-Platform Job
+# /job
 
-## When to Use
-
-When the other platform has assigned a job and saved it to `mission/`.
+Used when the other AI tool (Antigravity, OpenCode, etc.) has queued a self-contained task in `mission/job-NNN.md`. The receiving platform runs `/job NNN` to pick it up.
 
 ## Steps
 
-### Step 1: Find the Job
+### 1. Locate the job
 
-- If number given (e.g. `/job 3`): read `mission/job-003.md`
-- If no number: list all files in `mission/` with status PENDING, ask which one to run
+- Argument given (`/job 3`) → read `mission/job-003.md`.
+- No argument → list `mission/job-*.md` files with status `PENDING` (caveman one-line each); ask which.
 
-If the file doesn't exist or status is already DONE: tell the user and stop.
+If file missing or status is `DONE` → tell user, exit.
 
-### Step 2: Read the Job
+### 2. Parse
 
-Parse the job file:
-- What platform assigned it and when
-- The task description
-- Expected output
-- Any referenced context files (read them)
+Frontmatter: `id`, `status`, `from`, `to`, `created`. Body: `Context`, `Task`, `Expected Output`. Read referenced files only as needed (lazy).
 
-### Step 3: Execute
+### 3. Execute
 
-Perform the task. Apply standard quality rules:
-- L1: no build/type/lint errors
-- L2: output matches expected result
+Apply spawn matrix per Rule 11:
+- Job describes a code task → estimate size; spawn `coder` or handle inline.
+- Job is a question / report → handle inline.
+- Job describes a bug fix → spawn `debugger`.
 
-### Step 4: Save Result
+Run L1+L2 if code was changed.
 
-Append to the same `mission/job-NNN.md` file:
+### 4. Append Result section
 
 ```markdown
 ---
 ## Result
 
-**Status**: DONE ✅
-**Completed by**: {platform}
-**Completed at**: {date}
+status: DONE
+completed_by: {this platform}
+completed_at: {ISO timestamp}
 
-{description of what was done}
+summary (caveman): {1-3 lines}
 
-**Output files**: {list of files created or modified}
+output_files:
+  - {path}: {what changed}
+
+metrics:
+  L1: pass | fail | n/a
+  L2: pass | fail | n/a
 ```
 
-Change the `status` field in the frontmatter from `PENDING` to `DONE`.
+Update frontmatter `status: DONE`.
 
-### Step 5: Confirm to User
+### 5. Append SESSION-LOG.md (caveman)
 
 ```
-✅ Job {NNN} complete!
-
-📄 Result saved to mission/job-{NNN}.md
-🔁 Switch back to {other platform} to continue.
+{ISO timestamp} job-{NNN} done. summary: {1-line caveman}.
 ```
 
----
+### 6. Confirm (normal English)
 
-## How to Create a Job
+```
+Job {NNN} complete. Result appended to mission/job-{NNN}.md.
+Switch back to {from} platform to continue.
+```
 
-When you want to delegate a task to the other platform, create a file manually or ask Claude to create it:
+## Creating a Job
+
+Either platform can create jobs. Format:
 
 ```markdown
 ---
 id: "NNN"
 status: PENDING
-from: Claude Code
-to: Antigravity
-created: {date}
+from: {your platform}
+to: {target platform}
+created: {ISO date}
 ---
 
 # Job NNN: {title}
 
 ## Context
-{brief project context — what phase, what was just done}
+{brief; what phase, last completed task}
 
 ## Task
-{specific, self-contained task description}
+{self-contained, specific}
 
 ## Expected Output
-{what files or results should be produced}
+{files or results}
 ```
 
-Save as `mission/job-NNN.md`. Tell the user to switch platforms and run `/job NNN`.
+Save as `mission/job-NNN.md`. Tell user to switch platforms and run `/job NNN`.
+
+## Anti-Patterns (Forbidden)
+
+- Skip the L1+L2 check on code-changing jobs.
+- Run a job whose `to:` field doesn't match the current platform without explicit user override.
+- Modify the original `Task` field (jobs are append-only after `Result`).
+- Skip the SESSION-LOG entry.
+
+## Next
+
+Switch platforms; the originating side reads the Result.

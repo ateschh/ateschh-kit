@@ -1,90 +1,82 @@
 ---
-command: "/wireframe"
-description: "Defines the detailed content and layout of each page before coding. Locks WIREFRAMES.md."
-phase: "3.5"
-agents: ["architect", "designer"]
-skills: ["architecture-design"]
-outputs: ["WIREFRAMES.md locked"]
+command: /wireframe
+description: Locks per-page content + layout. Default after /design, before /build.
+phase: wireframe
+agents: [wireframer]
+skills: []
+outputs: [WIREFRAMES.md locked or skipped]
 ---
 
 # /wireframe
 
-## When to Use
-After `/design` and before `/build`. Optional but recommended — the more detail defined here, the more accurate the code.
+## Preconditions
+
+- `STATE.phase` is `wireframe`.
+- `{path}/STRUCTURE.md`, `{path}/DESIGN.md`, `{path}/design-system/MASTER.md` (if available) exist.
+
+## Path resolution
+
+Standalone: `{path} = projects/{name}/`
+Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
+
+## Modes
+
+`/wireframe`                    → interactive (default; user approves each page)
+`/wireframe --skip`             → skip; mark `wireframe_status: skipped`; advance to build
+`/wireframe --ai`               → ai-generated; lock without per-page approval; mark `wireframe_status: ai-generated`
 
 ## Steps
 
-> **Workspace mode**: If `.state/ACTIVE-PROJECT.md` has `Type == workspace`, use `App Path` for all file operations instead of `projects/{name}/`.
+### 1. Spawn wireframer
 
-1. Read `{path}/STRUCTURE.md` → get page list.
-   Read `{path}/design-system/MASTER.md` → get design tokens.
-   Read brainstorm/market research findings from `{path}/STATE.md` or `{path}/PLAN.md`.
+Single `Task(subagent_type: "wireframer", ...)` call. Caveman task body:
 
-### Phase 1 — Content Definition (page by page)
-
-2. For each page in STRUCTURE.md, Claude proposes a **written content list**:
-   - What sections/blocks are on this page
-   - What components each section contains
-   - What data or actions each component handles
-   - Based on: market research findings + design system + page purpose
-
-   Format per page:
-   ```
-   ## {Page Name}
-   **Purpose**: {one line}
-
-   ### Sections
-   - **{Section name}**: {what it contains, what it does}
-   - **{Section name}**: {what it contains, what it does}
-
-   ### Key Components
-   - {component}: {purpose}
-   - {component}: {purpose}
-
-   ### User Actions
-   - {action the user can take}
-   ```
-
-3. Present one page at a time. Wait for user to:
-   - ✅ Approve → move to next page
-   - ✏️ Edit → user requests changes → update → re-present → wait for approval
-   - ➕ Add → user adds items → incorporate → re-present
-
-4. Repeat step 2–3 for every page. Do not skip any.
-
-### Phase 2 — Layout Definition (ASCII wireframes)
-
-5. Once ALL pages are content-approved, generate an ASCII layout for each page based on the approved content list:
-
-   ```
-   ## {Page Name} — Layout
-
-   ┌─────────────────────────────────────┐
-   │ NAVBAR                    [avatar]  │
-   ├──────┬──────────────────────────────┤
-   │ NAV  │ [SECTION TITLE]              │
-   │      │ [component] [component]      │
-   │      │ [──────── component ───────] │
-   └──────┴──────────────────────────────┘
-   ```
-
-6. Present all ASCII layouts together. Ask: "Does the layout look right for each page? Any changes?"
-   - Wait for final approval or edits.
-   - Apply edits, re-present changed pages only.
-
-### Lock
-
-7. Write `{path}/WIREFRAMES.md` with all approved content lists + ASCII layouts. Mark status: LOCKED ✅.
-8. Update `{path}/STATE.md` — wireframe phase complete, next: `/build`.
-9. Update `{path}/PLAN.md` — each build task now references the corresponding wireframe section.
-10. Confirm:
 ```
-✅ Wireframes locked!
-📄 {N} pages defined in detail
-🗺 Content + layout approved for each page
-📋 PLAN.md updated with wireframe references
+wireframe pages. mode {interactive | ai-generated | skipped}. inputs below. write WIREFRAMES.md to {path} unless skipped.
 
-Next: `/build` — coding will follow the wireframes exactly.
+structure: {path}/STRUCTURE.md
+design: {path}/DESIGN.md
+master: {path}/design-system/MASTER.md (if exists)
+idea-analysis: {path}/IDEA-ANALYSIS.md
+
+mode: {mode}
+path: {path}
 ```
 
-**Next**: `/build`
+For `interactive` mode, the orchestrator stays in the user-facing role: `wireframer` proposes content + layout per page; orchestrator surfaces each to the user, captures approve/edit/add response, relays to `wireframer`. Orchestrator iterates with the agent until all pages are approved.
+
+For `ai-generated` mode, `wireframer` produces the full file in one pass and locks with `Status: AI-GENERATED`.
+
+For `skipped` mode, `wireframer` returns immediately with `wireframe_status: skipped`; no WIREFRAMES.md created.
+
+### 2. Parse return
+
+If `status: failed` → surface and stop, no advance.
+If `status: ok` and mode != skipped → confirm `artifacts: [WIREFRAMES.md]`.
+
+### 3. Wrap up
+
+- Update `{path}/STATE.md`:
+  - `wireframe_status: done | ai-generated | skipped`
+  - `phase: build`
+- `context-manager.write.session-summary`:
+  ```
+  wireframe {mode}. {N} pages. next /build.
+  ```
+- Append SESSION-LOG.md (caveman).
+
+### 4. Confirm
+
+Reply normal English. Examples:
+- interactive: "Wireframes locked. {N} pages. Run `/build` next."
+- ai: "Wireframes generated by AI. Review `WIREFRAMES.md`, edit if needed, then `/build`."
+- skipped: "Wireframe phase skipped. Run `/build` next; coder will infer layout from STRUCTURE.md and DESIGN.md."
+
+## Failure modes
+
+- `wireframer` returns `failed` → preserve partial draft in `{path}/.wip/wireframes/`.
+- User abandons mid-iteration in interactive mode → set `wireframe_status: pending` (not skipped); user can resume later.
+
+## Next
+
+`/build`

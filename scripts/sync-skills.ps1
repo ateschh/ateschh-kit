@@ -1,67 +1,72 @@
-# sync-selective-skills.ps1
-# Copies SKILL.md from a specific whitelist of global skills into ateschh-kit/skills/
+# sync-skills.ps1
+# Pulls a whitelist of community skills from the user's global Claude skills directory
+# into the kit at .claude/skills/community/. Run when refreshing community skill content.
+#
+# This is for kit maintainers updating the bundled skill set, not for end users.
 
-$Source = "C:\Users\murat\.claude\skills"
-$Dest   = "C:\GENERATOR\skills"
+$Source = Join-Path $env:USERPROFILE ".claude\skills"
+$Dest   = Join-Path $PSScriptRoot "..\.claude\skills\community"
 
 $whitelist = @(
-    # A - Web & Frontend
+    # Web & Frontend
     "nextjs-app-router-patterns",
     "nextjs-best-practices",
     "react-best-practices",
     "typescript-expert",
     "tailwind-design-system",
     "shadcn",
-    
-    # B - Mobile
+
+    # Mobile
     "react-native-architecture",
     "expo-deployment",
     "expo-api-routes",
     "flutter-expert",
-    
-    # C - Backend & DB
+
+    # Backend & DB
     "nodejs-backend-patterns",
     "fastapi-pro",
     "supabase-automation",
     "prisma-expert",
     "postgres-best-practices",
-    
-    # D - AI/ML
+
+    # AI/ML
     "llm-app-patterns",
     "rag-implementation",
     "prompt-engineering",
-    
-    # E - DevOps & Deploy
+
+    # DevOps & Deploy
     "docker-expert",
     "cloudflare-workers-expert",
     "vercel-deployment",
     "electron-development"
 )
 
-$copied = 0
+$copied  = 0
 $missing = 0
 
-Write-Host "Starting selective skill sync... ($($whitelist.Count) skills requested)" -ForegroundColor Cyan
+if (-not (Test-Path $Dest)) {
+    New-Item -ItemType Directory -Path $Dest -Force | Out-Null
+}
+
+Write-Host "Syncing community skills ($($whitelist.Count) requested)..." -ForegroundColor Cyan
 
 foreach ($skill in $whitelist) {
     $sourceDir = Join-Path $Source $skill
-    $skillMd = Join-Path $sourceDir "SKILL.md"
-    
+    $skillMd   = Join-Path $sourceDir "SKILL.md"
+
     if (Test-Path $skillMd) {
         $targetDir = Join-Path $Dest $skill
         if (-not (Test-Path $targetDir)) {
-            New-Item -ItemType Directory -Path $targetDir | Out-Null
+            New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
         }
         Copy-Item -Path $skillMd -Destination (Join-Path $targetDir "SKILL.md") -Force
         $copied++
-        Write-Host "✅ Copied: $skill" -ForegroundColor Green
+        Write-Host "  copied: $skill" -ForegroundColor Green
     } else {
         $missing++
-        Write-Host "❌ Missing or no SKILL.md: $skill" -ForegroundColor Red
+        Write-Host "  missing: $skill" -ForegroundColor Yellow
     }
 }
 
 Write-Host ""
-Write-Host "Done!" -ForegroundColor Cyan
-Write-Host "  Copied : $copied skills" -ForegroundColor Green
-Write-Host "  Missing: $missing skills" -ForegroundColor Yellow
+Write-Host "Done. Copied: $copied. Missing: $missing." -ForegroundColor Cyan

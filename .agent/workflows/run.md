@@ -1,129 +1,89 @@
 ---
-command: "/run"
-description: "Compiles and runs the app. Fixes errors automatically. Logs everything."
-phase: "4+"
+command: /run
+description: Compiles and runs the app. On error, spawns debugger per Rule 11. Appends caveman entries to run-log.md.
+phase: any
+agents: [debugger, context-manager]
+skills: []
+outputs: [Live app, run-log.md appended]
 ---
 
-# /run — Run & Verify
+# /run
 
-## When to Use
+Verify the app starts and the core flow works. Surface errors and fix them via `debugger`.
 
-- After completing a phase or a group of tasks in `/build`
-- When you want to see the app working before continuing
-- When something feels broken and you want a clean check
+## Path resolution
 
----
+Standalone: `{path} = projects/{name}/`
+Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
 
 ## Steps
 
-### Step 1: Read Project Context
+### 1. Read context (minimal)
 
-Read:
-- `projects/{name}/STATE.md` → current phase and last completed task
-- `projects/{name}/REQUIREMENTS.md` → framework and run commands
+- `{path}/STATE.md` (frontmatter only).
+- `{path}/REQUIREMENTS.md` (stack + framework).
+- `{path}/package.json` (dev script).
 
-### Step 2: Determine Run Command
+### 2. Determine run command
 
-Based on the framework in REQUIREMENTS.md:
-
-| Framework | Dev Command |
-|-----------|------------|
+| Framework (from REQUIREMENTS) | Dev command |
+|---|---|
 | Next.js | `npm run dev` |
 | Expo | `npx expo start` |
 | Vite | `npm run dev` |
-| Hono / Node | `npm run dev` or `node src/index.js` |
+| Hono / Node | `npm run dev` (or fallback to `node src/index.js`) |
 | Electron | `npm run electron:dev` |
-| Other | Read package.json scripts, pick the dev command |
+| Other | Read `package.json` scripts; pick the dev script |
 
-If unclear, read `package.json` → `scripts` to find the right command.
-
-### Step 3: Build Check (L1)
-
-Before running, do a build/type check:
+### 3. Build check (L1)
 
 ```
-npm run build   # or tsc --noEmit for type check only
+npm run build
 ```
 
-If build fails:
-1. Read the full error output
-2. Identify root cause
-3. Fix the file(s)
-4. Re-run build check
-5. Repeat until clean
+If fail:
+- Capture error output.
+- Spawn `debugger` via `Task()` with the build error as defect (caveman task body).
+- After debugger fix, retry `npm run build`. Two attempts max per Rule 11.
 
-### Step 4: Start the App
+### 4. Start dev server
 
-Run the dev command. Observe the output for:
-- Startup errors (port conflicts, missing env vars, import errors)
-- Runtime errors in the console
-- Any warnings that indicate real problems
+Run dev command in background (Bash with `run_in_background: true` or platform equivalent).
 
-Fix each issue before proceeding.
+Watch first 30 seconds for:
+- Port conflicts → ask user to free the port or pass `--port`.
+- Missing env vars → list missing keys, refer to `.env.example`.
+- Import errors → spawn `debugger`.
 
-### Step 5: Verify Core Flow
+### 5. Smoke test core flow
 
-After the app starts successfully, confirm:
-- [ ] App starts without crashing
-- [ ] Main page / entry point loads
-- [ ] No red errors in terminal
-- [ ] Core user flow works (based on what's been built so far)
+If WIREFRAMES.md or STRUCTURE.md exists:
+- Identify Golden Path (entry → core action → success).
+- Manually walk through it (read-only check; user does the clicking unless an MCP tool is available).
+- Confirm no console errors.
 
-### Step 6: Save Run Log
+### 6. Append run-log.md (caveman)
 
-Append to `projects/{name}/run-log.md`:
-
-```markdown
-## Run — {date} — Phase {N}
-
-**Trigger**: {what the user was checking}
-**Status**: ✅ Success / ❌ Failed → Fixed
-
-### Errors encountered
-{list each error}
-
-### Fixes applied
-{for each error: what file, what change, why}
-
-### Final state
-{app starts at: URL or port}
-{what works, what is not yet built}
-```
-
-If no errors: still log it as a clean run.
-
-### Step 7: Report to User
+`{path}/run-log.md` is append-only:
 
 ```
-✅ App is running!
-
-🌐 URL: http://localhost:3000
-📋 Phase {N} — {N} tasks complete
-
-What works now:
-- {feature 1}
-- {feature 2}
-
-What's not built yet:
-- {next tasks from PLAN.md}
-
-Errors fixed this run: {N}
-Full log: projects/{name}/run-log.md
+{ISO timestamp} run. {framework}. {url}. status {ok | failed-fixed | failed}. errors {N}. fixes {list}.
 ```
 
-If the app could not be fixed:
-```
-❌ Could not start the app.
+### 7. Confirm to user
 
-Blocker: {description}
-Attempted fixes: {list}
-Recommendation: {next step}
-```
+- Success: "App at {url}. Golden Path ok. {N} errors fixed during run."
+- Partial: "App at {url}. {N} unresolved warnings. See run-log.md."
+- Failure: "App did not start. Blocker: {description}. Tried {N} debugger spawns. Manual intervention needed."
 
----
+## Anti-Patterns (Forbidden)
 
-## Notes
+- Run dev server without first attempting build check.
+- Modify locked files to silence warnings.
+- Move on (advance phase) when the app does not start.
+- Overwrite previous run-log entries (append-only).
+- Skip Golden Path verification when WIREFRAMES exist.
 
-- Do not move on to new tasks until the app runs cleanly
-- If an error requires a structural fix (wrong architecture, missing setup), escalate to user before changing anything major
-- Run log is append-only — never overwrite past entries
+## Next
+
+If clean → continue work. If errors persisted → `/test` for full L1–L4, or `/quick` to fix manually.

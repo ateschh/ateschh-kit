@@ -1,39 +1,75 @@
 ---
-command: "/quick"
-description: "Ad-hoc task without the full pipeline. For small, one-off requests."
-phase: "any"
-agents: []
+command: /quick
+description: Ad-hoc task bypass. No phase advance, no PLAN.md, no STATE schema changes. Spawn matrix decides delegation.
+phase: any
+agents: [coder, debugger, context-manager]
 skills: []
-outputs: ["Completed ad-hoc task", "Logged in BACKLOG.md if relevant"]
+outputs: [Completed task, optional BACKLOG / DECISIONS append]
 ---
 
 # /quick
 
-Handles small focused tasks that don't need the full pipeline: bug fixes, small features, code explanations, refactoring a file, one-off scripts.
+For one-off requests outside the main pipeline: a small bug fix, a question, a quick refactor, a one-shot script.
 
-**Use `/quick` for**: bug fixes, small additions, code review, refactoring a file, one-off scripts.
-**Don't use for**: new full projects (`/new-project`), changes to REQUIREMENTS.md/DESIGN.md, multi-day features.
+`/quick` does **not** advance project phase, does **not** write PLAN.md, does **not** mark wireframes done. It's a bypass.
+
+Use:
+- Bug fix outside the current phase scope.
+- Code explanation / review question.
+- Single-file refactor.
+- One-off script.
+
+Don't use for:
+- New features (use `/build`).
+- Changes to locked files (use `/polish`).
+- Multi-day work (split into a project).
 
 ## Steps
 
-1. If task not stated in the command, ask: "What do you want to do? (one sentence)"
-2. Generate mini-plan:
-   ```
-   Quick Task Plan:
-   1. {step 1}
-   2. {step 2}
-   3. {step 3}
-   Estimated time: {X minutes}
-   Files affected: {list}
-   Proceed?
-   ```
-3. Execute directly — no agent unless task is complex (>50 lines). Run L1+L2 after.
-4. Log if relevant: bug fix → STATE.md, feature idea → BACKLOG.md, decision → DECISIONS.md.
-5. Confirm:
-   ```
-   ✅ Done: {what was done}
-   {result or output}
-   Back to your main project whenever you're ready.
-   ```
+### 1. Capture task
 
-Does NOT change active project or STATE.md unless task is directly related to it.
+If task wasn't stated, ask once: "What is the task? (one sentence)"
+
+### 2. Spawn decision (per Rule 11)
+
+```
+spawn = (lines_changed_estimate > 20)
+     or (files_touched > 1)
+     or (domain expertise needed: design / deploy / debug)
+```
+
+Inline → orchestrator does it directly.
+Spawn → `coder` Task() with caveman task body. Bug fix → spawn `debugger` instead.
+
+### 3. Lazy context
+
+If a project is active and the task touches its code:
+- Read REQUIREMENTS.md (constraint check).
+- `context-manager.recall.code <target>` (Graphify or grep fallback).
+
+If no project active, work in the bare directory.
+
+### 4. Execute
+
+Do the work (inline or via spawned agent). Run L1+L2 if it's code.
+
+### 5. Log selectively
+
+- Bug fix related to active project → append `DECISIONS.md` via `context-manager.write.decision`.
+- New idea surfaced → append `BACKLOG.md` (single line, no timestamp ceremony).
+- Configuration / settings touched → mention in confirmation; do not modify STATE.md unless task is explicitly part of project work.
+
+### 6. Confirm
+
+Reply normal English: 1–2 lines. Result + any side notes.
+
+## Anti-Patterns (Forbidden)
+
+- Advance project phase.
+- Write to STATE.md unless the task explicitly fixed something the user asked to log.
+- Modify locked files (REQUIREMENTS, DESIGN, WIREFRAMES, STRUCTURE, DECISIONS in their locked sections).
+- Treat `/quick` as `/build` (bypass spawn matrix).
+
+## Next
+
+Back to whatever the user was doing. `/status` to see the active project.

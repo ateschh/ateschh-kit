@@ -6,6 +6,58 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.0.0] — 2026-04-29
+
+Major rewrite. **Breaking changes** for v1.x projects — run `/migrate` after updating.
+
+### Added
+
+- **Real subagent delegation.** All 12 agents live at `.claude/agents/` with Claude Code's standard frontmatter (`name`, `description`, `tools`, `model`). Workflows now spawn agents via `Task(subagent_type: "<name>", ...)` instead of merely reading their definition files.
+- **Rule 11 — Agent Contract.** Spawn decision matrix, output schema (`OUTPUT-SCHEMA.md`), handoff matrix, parallel dispatch algorithm, anti-patterns, escalation ladder.
+- **Parallel dispatch.** `/build --all`, `/build --batch` run independent PLAN.md tasks in parallel waves (default concurrency 3). DAG built from `dependencies` and `files_touched`; conflict-free task selection per wave.
+- **Lean `/save` and `/resume`.** Caveman-compressed session summaries to MemPalace. `/resume` loads ≤ 5k tokens before user confirms continuation; lazy-loads phase-specific artefacts thereafter. Target ≤ 8% context after resume.
+- **Polish loop (`/polish`).** Iteration phase between `/test` (passing) and `/deploy`. Locked-file unlock protocol, size cap (S/M/L), soft guard at iteration 5+, append-only audit trail under `polish/iteration-{N}/`.
+- **New agents:** `wireframer` (locks WIREFRAMES.md), `qa-reviewer` (L4 owner pre-deploy), `context-manager` (MemPalace + Graphify abstraction).
+- **Graphify integration.** `/map-codebase` prefers Graphify, falls back to 4-agent parallel analysis. `/build`, `/edit`, `/resume` query Graphify for code structure via `context-manager.recall.code` (grep fallback).
+- **MemPalace integration.** Project + per-agent diaries replace `MEMORY.md` verbatim dumps. `MEMORY.md` becomes a thin pointer.
+- **Caveman matrix.** `Rule 12` defines where caveman style is required (Task() task bodies, agent returns, STATE.md, SESSION-LOG.md, MemPalace, commits) vs forbidden (user replies, locked project files).
+- **Context7 cache.** `requirements-expert` writes per-library API summaries to `.context7-cache/<lib>@<ver>/`. `coder` reads from cache; saves ~20–40k tokens per `/build` session.
+- **Rule 09 — Error Recovery.** Failure categories, fallback order, WIP rollback semantics, interrupt handling.
+- **Rule 10 — Polish Loop.** Locked-file unlock protocol, size caps, soft guard.
+- **Rule 12 — Caveman Style.** Application matrix, style rules, examples.
+- **STATE.md schema upgrade.** New fields: `kit_version`, `phase` enum, `wireframe_status`, `iteration_count`, `current_wave`, `running_agents`, `parallel_concurrency`, `interrupted`, `last_session_id`.
+- **PLAN.md schema.** `id`, `size` (S/M/L), `dependencies`, `files_touched`, `acceptance_criteria`, `status`, `notes`. Required for parallel dispatch.
+- **`scripts/validate.ps1`.** Frontmatter, output contract, anti-patterns, sync drift, design-search.py presence checks.
+- **`scripts/sync-commands.ps1` + `.sh`.** `.claude/commands/` is the single source of truth; `.agent/workflows/` and `.opencode/commands/` are generated.
+- **Phase enum.** `brainstorm | requirements | design | wireframe | build | test | deploy-ready | polish-N | deployed`. `/next` is now a deterministic state-machine router.
+- **`/quick`, `/run`, `/edit`, `/status`, `/finish`, `/settings`, `/job`, `/workspace`, `/app` modernised** to honour Rule 11 spawn matrix and Rule 12 caveman matrix.
+
+### Changed
+
+- Agents relocated `agents/` → `.claude/agents/`.
+- Skills relocated `skills/` → `.claude/skills/` (canonical) and `.claude/skills/community/` (advisory).
+- `design-search.py` cross-platform safe (Windows-friendly Python detection).
+- `/design` precondition fixed (was checking wrong phase).
+- `/wireframe` is now the default after `/design`; can be skipped with `--skip-wireframe` or `--ai-wireframe`.
+- `/build` is wireframe-gated.
+- `/test` runs L1–L3 via `tester`, then L4 via `qa-reviewer`. Distinct ownership.
+- `/deploy` reads `deploy_target` from `REQUIREMENTS.md`. Manual mode for `other`.
+- README in English only; `README.tr.md` removed.
+- `Rule 02 — Language Policy` rewritten: system English-only, chat language is user choice.
+
+### Removed
+
+- `agents/` and `skills/` at repo root.
+- `context-agent/` (replaced by `context-manager` agent + MemPalace).
+- `README.tr.md`.
+- Bundled `build` skill (third-party, conflicted with `/build` command).
+
+### Migration
+
+Existing v1.x projects continue to work in degraded mode. Run `/migrate` to upgrade a project to v2.0 (backup taken automatically; `/rollback` available if needed).
+
+---
+
 ## [1.4.7] — 2026-04-08
 
 ### Added

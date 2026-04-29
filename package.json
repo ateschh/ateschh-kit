@@ -1,17 +1,19 @@
 {
   "name": "ateschh-kit",
-  "version": "1.4.8",
-  "description": "A structured AI development system for Claude Code and Antigravity",
+  "version": "2.0.0",
+  "description": "A structured AI development system for Claude Code, Antigravity, and OpenCode. Real subagent delegation, lean save/resume, polish loop, integrated Graphify + MemPalace + Caveman.",
   "keywords": [
     "claude",
     "claude-code",
     "antigravity",
+    "opencode",
     "ai",
     "development",
     "workflow",
-    "agents",
-    "cursor",
-    "windsurf"
+    "subagents",
+    "graphify",
+    "mempalace",
+    "caveman"
   ],
   "homepage": "https://github.com/ateschh/ateschh-kit",
   "repository": {
@@ -23,26 +25,29 @@
     "ateschh-kit": "bin/install.js"
   },
   "scripts": {
-    "test": "echo \"No automated tests yet\""
+    "test": "pwsh -File scripts/validate.ps1",
+    "validate": "pwsh -File scripts/validate.ps1",
+    "sync": "pwsh -File scripts/sync-commands.ps1",
+    "sync:skills": "pwsh -File scripts/sync-skills.ps1",
+    "doctor": "node bin/install.js doctor"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "files": [
     "bin/",
-    "agents/",
-    "skills/",
     "templates/",
     ".agent/",
     ".claude/",
     ".opencode/",
+    "scripts/",
     "CLAUDE.md",
     "AGENTS.md",
     "design-engine/",
     "design-search.py",
+    "setup.py",
     "ARCHITECTURE.md",
     "README.md",
-    "README.tr.md",
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "LICENSE"
