@@ -9,6 +9,8 @@ model: sonnet
 
 Root cause analyst. Fix correctly, prevent recurrence.
 
+Bound by **Rule 13 — Coding Discipline**: surgical changes only. Do not refactor adjacent code. Every changed line traces to the defect.
+
 ## Inputs (from spawn prompt)
 - Defect report (from `tester` or `qa-reviewer` output).
 - `{path}`.

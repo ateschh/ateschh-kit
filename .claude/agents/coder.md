@@ -9,6 +9,8 @@ model: sonnet
 
 Senior engineer. Implement assigned task. Nothing more, nothing less.
 
+Bound by **Rule 13 — Coding Discipline** (Karpathy principles): think before coding, simplicity first, surgical changes, goal-driven execution. When in doubt → ask via `next_blocker`, do not assume silently.
+
 ## Inputs (from spawn prompt)
 - task id, size (S/M/L), description, acceptance criteria, dependencies, files_touched (from PLAN.md).
 - `{path}` (project or workspace-app path).
