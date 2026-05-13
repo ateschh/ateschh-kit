@@ -6,6 +6,36 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.0.3] — 2026-05-14
+
+### Added
+- **Project `.gitignore` template** (`templates/project/.gitignore`) — ships sensible defaults (`.state/`, `.kit-version`, `sessions/`, `.wip/`, `.backup-pre-*/`, `graphify-out/`, `.context7-cache/`, `node_modules/`, etc.). `/new-project` and `bin/install.js` scaffold step copy it automatically.
+- **`validate.ps1` Rule 13 + acceptance_criteria checks** — warns when code-writing agents (coder/debugger/architect) drop Rule 13 reference, when PLAN.md pending tasks have empty `acceptance_criteria` (blocks parallel dispatch), or when `CHANGELOG.md` lacks an entry for current `package.json` version.
+- **`doctor` version matrix** — `npx ateschh-kit doctor` now prints kit / graphify / mempalace / caveman / Context7 versions side-by-side.
+- **Rule 11 — workspace-mode parallel dispatch** subsection clarifying that `files_touched` is app-scoped and waves can mix apps when no shared file overlap.
+
+### Fixed
+- **`migrate.py`** now syncs `.state/ACTIVE-PROJECT.md` `**Phase**:` line to STATE.phase enum (was leaving v1 prose like "Phase 4 — Build"). Idempotent — skips when already in enum form.
+- **CHANGELOG backfill** — entries for [2.0.1] graphify auto-init and [2.0.2] Rule 13 added.
+
+## [2.0.2] — 2026-04-30
+
+### Added
+- **Rule 13 — Coding Discipline** (`.claude/rules/13-coding-discipline.md`): four behavioral principles adapted from Andrej Karpathy's observations on LLM coding pitfalls (via forrestchang/andrej-karpathy-skills).
+  1. Think Before Coding — surface assumptions, ask when uncertain
+  2. Simplicity First — minimum code, no speculative features
+  3. Surgical Changes — touch only what the task requires
+  4. Goal-Driven Execution — verifiable success criteria
+- `coder.md` and `debugger.md` prelude cites Rule 13.
+- `CLAUDE.md` / `AGENTS.md` clarify Rule 13 binds agent spawns AND orchestrator inline edits.
+
+## [2.0.1] — 2026-04-29
+
+### Added
+- **Graphify auto-init on first `/build`** — when a project lacks `graphify-out/graph.json` and code files exist, `/build` automatically runs `git init` (if needed), `graphify update .`, and `graphify hook install`. User no longer needs to remember manual bootstrap.
+
+---
+
 ## [2.0.0] — 2026-04-29
 
 Major rewrite. **Breaking changes** for v1.x projects — run `/migrate` after updating.

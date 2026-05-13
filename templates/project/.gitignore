@@ -1,0 +1,61 @@
+# ATESCHH KIT — project-level gitignore template
+
+# Kit runtime state (per-project, not source)
+.state/
+.kit-version
+sessions/
+
+# Work-in-progress and rollback snapshots (Rule 09)
+.wip/
+.backup-pre-*/
+.rollback-discarded-*/
+.migration-log.md
+
+# Integration outputs
+graphify-out/
+.context7-cache/
+.mempalace/
+
+# Build artefacts
+node_modules/
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+.vercel/
+.turbo/
+.cache/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Databases (local dev only — adjust per project)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Logs
+*.log
+logs/

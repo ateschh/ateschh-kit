@@ -9,8 +9,10 @@
 #   4. Skill frontmatter has required fields (name, description).
 #   5. Command tree (.claude/commands/, .agent/workflows/, .opencode/commands/) is in sync.
 #   6. No deprecated paths used (agents/, skills/ at repo root must not exist).
-#   7. No dead skill references in agent definitions.
-#   8. design-search.py exists and is non-empty.
+#   7. design-search.py exists and is non-empty.
+#   8. Rule 13 reference in code-writing agents (coder, debugger, architect).
+#   9. PLAN.md tasks: pending status with empty acceptance_criteria warn (blocks /build --all).
+#   10. CHANGELOG.md has entry for current package.json version.
 #
 # Exit code 0 = pass, 1 = fail. Failures are listed.
 
@@ -116,7 +118,58 @@ if (-not (Test-Path $ds)) {
     Add-Failure "design-search.py is empty"
 }
 
-# 7. Report.
+# 7. Rule 13 conformance on code-writing agents.
+$ruleAgents = @("coder.md", "debugger.md", "architect.md")
+foreach ($a in $ruleAgents) {
+    $p = Join-Path $agentDir $a
+    if (Test-Path $p) {
+        $content = Get-Content -Raw $p
+        if ($content -notmatch "Rule 13") {
+            Add-Failure "agent $a missing Rule 13 reference (Coding Discipline)"
+        }
+    }
+}
+
+# 8. PLAN.md acceptance_criteria check on active projects.
+$projectsDir = Join-Path $root "projects"
+if (Test-Path $projectsDir) {
+    Get-ChildItem -Path $projectsDir -Directory | ForEach-Object {
+        $planFiles = Get-ChildItem -Path $_.FullName -Filter "PLAN*.md" -File -ErrorAction SilentlyContinue
+        foreach ($pf in $planFiles) {
+            $text = Get-Content -Raw $pf.FullName
+            # Match yaml task blocks: id, status, acceptance_criteria
+            $taskBlocks = [regex]::Matches($text, '(?s)```yaml\s*\n(.*?)```')
+            foreach ($block in $taskBlocks) {
+                $body = $block.Groups[1].Value
+                $isPending = [regex]::IsMatch($body, 'status:\s*pending')
+                $emptyEmpty = [regex]::IsMatch($body, 'acceptance_criteria:\s*\[\s*\]')
+                $emptyMissing = [regex]::IsMatch($body, 'acceptance_criteria:\s*\r?\n\s*notes:')
+                if ($isPending -and ($emptyEmpty -or $emptyMissing)) {
+                    $idMatch = [regex]::Match($body, 'id:\s*(\S+)')
+                    $id = if ($idMatch.Success) { $idMatch.Groups[1].Value } else { '?' }
+                    $name = $_.Name
+                    $fileName = $pf.Name
+                    Add-Failure "WARN: $name/$fileName task $id pending with empty acceptance_criteria (blocks /build --all)"
+                    break
+                }
+            }
+        }
+    }
+}
+
+# 9. CHANGELOG has entry for current package.json version.
+$pkgPath = Join-Path $root "package.json"
+$changelogPath = Join-Path $root "CHANGELOG.md"
+if ((Test-Path $pkgPath) -and (Test-Path $changelogPath)) {
+    $pkg = Get-Content -Raw $pkgPath | ConvertFrom-Json
+    $version = $pkg.version
+    $changelog = Get-Content -Raw $changelogPath
+    if ($changelog -notmatch "\[$([regex]::Escape($version))\]") {
+        Add-Failure "CHANGELOG.md missing entry for [$version] (package.json version)"
+    }
+}
+
+# 10. Report.
 if ($failures.Count -eq 0) {
     Write-Host "validate: ok" -ForegroundColor Green
     exit 0

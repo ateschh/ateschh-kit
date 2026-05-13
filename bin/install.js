@@ -140,18 +140,31 @@ function doctor(targetDir) {
   })
 
   // Graphify
+  const versions = {}
   check('graphify', () => {
     const w = which('graphify')
     if (!w) return { ok: false, detail: 'not installed (uv tool install graphifyy or pipx install graphifyy)' }
     // graphify uses --help (no --version flag); just probe the entrypoint exists.
     const r = tryRun('graphify', ['--help'])
+    // Best-effort version parse from help header (graphify prints "Usage:..." first line; no version in v0.x).
+    versions.graphify = r.ok ? 'installed' : 'unknown'
     return { ok: r.ok, detail: r.ok ? `reachable at ${w}` : r.stderr.trim() || 'invocation failed' }
   })
 
   // MemPalace
   check('mempalace', () => {
     const w = which('mempalace')
-    if (!w) return { ok: false, detail: 'not installed (pip install mempalace; configure as MCP)' }
+    if (!w) {
+      versions.mempalace = 'absent'
+      return { ok: false, detail: 'not installed (pip install mempalace; configure as MCP)' }
+    }
+    const r = tryRun('mempalace', ['--version'])
+    if (r.ok) {
+      const m = (r.stdout || '').trim().match(/\d+\.\d+\.\d+/)
+      versions.mempalace = m ? m[0] : r.stdout.trim() || 'reachable'
+      return { ok: true, detail: versions.mempalace }
+    }
+    versions.mempalace = 'reachable'
     return { ok: true, detail: 'reachable' }
   })
 
@@ -167,19 +180,39 @@ function doctor(targetDir) {
         path.join(home, '.claude', 'plugins', 'JuliusBrussee', 'caveman'),
       ]
       for (const p of candidates) {
-        if (fs.existsSync(p)) return { ok: true, detail: `plugin installed at ${p}` }
+        if (fs.existsSync(p)) {
+          versions.caveman = 'installed'
+          return { ok: true, detail: `plugin installed at ${p}` }
+        }
       }
     }
     if (which('claude')) {
       const r = tryRun('claude', ['plugin', 'list'])
-      if (r.ok && /caveman/i.test(r.stdout)) return { ok: true, detail: 'plugin listed by claude CLI' }
+      if (r.ok && /caveman/i.test(r.stdout)) {
+        versions.caveman = 'installed'
+        return { ok: true, detail: 'plugin listed by claude CLI' }
+      }
     }
+    versions.caveman = 'absent'
     return { ok: false, detail: 'plugin not detected; run `claude plugin install caveman@caveman` inside Claude Code' }
   })
 
   // Context7
   check('context7-mcp', () => {
+    const home = process.env.USERPROFILE || process.env.HOME
+    const claudeJson = home ? path.join(home, '.claude.json') : null
+    if (claudeJson && fs.existsSync(claudeJson)) {
+      try {
+        const cfg = JSON.parse(fs.readFileSync(claudeJson, 'utf8'))
+        const allow = cfg.mcp?.allowlist || cfg.permissions?.mcp?.allowlist || []
+        if (Array.isArray(allow) && allow.includes('context7')) {
+          versions.context7 = 'allowlisted'
+          return { ok: true, detail: 'context7 present in ~/.claude.json MCP allowlist' }
+        }
+      } catch (_) { /* ignore parse errors */ }
+    }
     const r = tryRun(process.platform === 'win32' ? 'where' : 'which', ['npx'])
+    versions.context7 = r.ok ? 'npx-ready' : 'absent'
     return { ok: r.ok, detail: r.ok ? 'install with: npx -y @upstash/context7-mcp' : 'npx missing' }
   })
 
@@ -190,6 +223,16 @@ function doctor(targetDir) {
     return { ok: true, detail: 'present (run: npm run validate)' }
   })
 
+  log('')
+  // Version matrix
+  const pkgPath = path.join(__dirname, '..', 'package.json')
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
+  log('Version matrix:')
+  log(`  kit         ${pkg.version}`)
+  log(`  graphify    ${versions.graphify || 'unknown'}`)
+  log(`  mempalace   ${versions.mempalace || 'unknown'}`)
+  log(`  caveman     ${versions.caveman || 'unknown'}`)
+  log(`  context7    ${versions.context7 || 'unknown'}`)
   log('')
   log(`${okCount} ok, ${issueCount} issue(s)`)
   log('')

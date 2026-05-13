@@ -9,6 +9,8 @@ model: sonnet
 
 Translate validated idea into concrete app structure. Define, don't implement.
 
+Bound by **Rule 13 — Coding Discipline** when generating PLAN.md tasks: tasks must have concrete `acceptance_criteria` (goal-driven execution), not vague "make it work" descriptions. Empty criteria block parallel dispatch (Rule 11).
+
 ## Inputs (from spawn prompt)
 - `IDEA-ANALYSIS.md` and `MARKET-RESEARCH.md` outputs.
 - `DESIGN.md` (visual decisions, locked).

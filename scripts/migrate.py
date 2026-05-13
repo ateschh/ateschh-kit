@@ -203,6 +203,74 @@ def stamp_version(ctx: MigrationContext) -> None:
         ctx.log(f".kit-version stamped {ctx.to_version}")
 
 
+def sync_active_project_md(ctx: MigrationContext) -> None:
+    """Update .state/ACTIVE-PROJECT.md Phase line to STATE.phase enum (v2 format).
+
+    Idempotent: skips when Phase line already in enum form (one of the v2 enum values).
+    Safety: only updates when ACTIVE-PROJECT.md Project name matches the migrated project.
+    """
+    # kit_root = .../projects/<name>/ -> .../
+    kit_root = ctx.project_path.parent.parent
+    active_md = kit_root / ".state" / "ACTIVE-PROJECT.md"
+    if not active_md.exists():
+        ctx.log("ACTIVE-PROJECT.md absent; skipping sync")
+        return
+
+    text = active_md.read_text(encoding="utf-8")
+    # Verify the migrated project is the active project
+    name_line = f"- **Project**: {ctx.project_path.name}"
+    if name_line not in text:
+        ctx.log(f"ACTIVE-PROJECT.md does not point at {ctx.project_path.name}; skipping sync")
+        return
+
+    # Read STATE.phase enum
+    state_md = ctx.project_path / "STATE.md"
+    state_text = state_md.read_text(encoding="utf-8") if state_md.exists() else ""
+    phase_match = re.search(r"^phase:\s*(\S+)", state_text, re.MULTILINE)
+    if not phase_match:
+        ctx.log("STATE.phase not found; skipping ACTIVE-PROJECT sync")
+        return
+    phase_enum = phase_match.group(1).strip()
+
+    valid_enums = {
+        "brainstorm", "requirements", "design", "wireframe",
+        "build", "test", "deploy-ready", "deployed",
+    }
+    # polish-N also valid
+    if phase_enum not in valid_enums and not phase_enum.startswith("polish-"):
+        ctx.log(f"STATE.phase '{phase_enum}' not a known v2 enum; skipping sync")
+        return
+
+    # Idempotent: if Phase line already shows enum, skip
+    enum_re = re.compile(r"^- \*\*Phase\*\*: (brainstorm|requirements|design|wireframe|build|test|deploy-ready|deployed|polish-\d+)$", re.MULTILINE)
+    if enum_re.search(text):
+        ctx.log("ACTIVE-PROJECT.md Phase already in enum form; skipping")
+        return
+
+    # Replace any "- **Phase**: ..." line with enum form
+    new_phase_line = f"- **Phase**: {phase_enum}"
+    today = datetime.now().strftime("%Y-%m-%d")
+    migrated_flag_line = f"- **Migrated to v2.0**: {today}"
+
+    new_text, n = re.subn(
+        r"^- \*\*Phase\*\*:.*$",
+        new_phase_line + "\n" + migrated_flag_line,
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if n == 0:
+        ctx.log("ACTIVE-PROJECT.md has no Phase line; skipping sync")
+        return
+
+    if ctx.dry_run:
+        ctx.log(f"would sync ACTIVE-PROJECT.md Phase -> {phase_enum}")
+        return
+
+    active_md.write_text(new_text, encoding="utf-8")
+    ctx.log(f"ACTIVE-PROJECT.md Phase synced -> {phase_enum}")
+
+
 def postflight(ctx: MigrationContext) -> list[str]:
     issues: list[str] = []
     state = ctx.project_path / "STATE.md"
@@ -363,6 +431,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         transform_memory_md(ctx)
         cleanup_stale_artifacts(ctx)
         stamp_version(ctx)
+        sync_active_project_md(ctx)
     except Exception as exc:
         print(f"[migrate] transformer failed: {exc}", file=sys.stderr)
         return 3

@@ -102,6 +102,16 @@ loop:
 
 Before assembling a wave, the orchestrator computes `files_touched` for every leaf. Tasks whose sets intersect cannot be in the same wave. They are queued for sequential execution after the wave completes.
 
+### Workspace-mode parallel dispatch
+
+When `STATE.type == workspace`, the orchestrator may run waves across **multiple apps** in the same workspace simultaneously:
+
+- `files_touched` is resolved **per app**: a task's paths are interpreted relative to `projects/{workspace}/apps/{app}/`. Two tasks from different apps cannot collide on intra-app paths.
+- Cross-app overlap is checked only for **workspace-level files** (e.g. `projects/{workspace}/DESIGN-SYSTEM.md`, `projects/{workspace}/DECISIONS.md`). If both tasks declare such paths in `files_touched`, they cannot be in the same wave.
+- Default `parallel_concurrency` (3) applies workspace-wide, not per-app. To run 3 tasks each across 2 apps, raise `parallel_concurrency` to 6 in `settings.local.json`.
+- `STATE.running_agents` entries include `app` field: `[{name: coder, task_id: T-014, app: web}, {name: coder, task_id: T-103, app: mobile}]`.
+- `/build --all` in workspace mode iterates per app's `PLAN.md`; the orchestrator interleaves leaves from all apps' DAGs.
+
 ## 5. Anti-Patterns (Forbidden)
 
 - Spawning a subagent for a single-line trivial change.
