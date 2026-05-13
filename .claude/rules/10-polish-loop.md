@@ -56,9 +56,9 @@ Each polish iteration declares a size at start: `S | M | L`.
 
 Cap exists to prevent perfectionist drift. If a polish iteration exceeds its declared size, orchestrator pauses and asks the user to either escalate the size or split into a new iteration.
 
-## 5. Soft guard against over-iteration
+## 5. Soft guard + hard ceiling against over-iteration
 
-After `iteration_count` ≥ 5, orchestrator surfaces:
+**Soft guard** at `iteration_count` ≥ 5 — orchestrator surfaces:
 
 ```
 Polish iteration {N+1} requested. Current count: 5.
@@ -69,6 +69,18 @@ Consider:
 ```
 
 User must respond with a reason to continue. The reason is logged to `DECISIONS.md`.
+
+**Hard ceiling** at `iteration_count` ≥ 10 (v2.2.0+):
+
+```
+Polish iteration {N+1} refused. Hard cap (10) reached.
+Options:
+- /deploy current state and ship
+- /finish to archive this project and /new-project for the next iteration scope
+- raise the cap manually in STATE.md only with audit-trail justification in DECISIONS.md
+```
+
+Orchestrator refuses to start `polish-11` without explicit STATE.md edit + DECISIONS.md entry. `/polish --overnight` honors the cap and stops the `/loop` when reached.
 
 ## 6. Phase transitions
 

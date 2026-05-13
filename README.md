@@ -77,9 +77,9 @@ Each phase is gated. You can't accidentally skip from brainstorm straight to cod
 | `/requirements` | Select and lock the tech stack; seed Context7 cache |
 | `/design` | Theme + page structure (architect + designer in parallel) |
 | `/wireframe` | Lock per-page content + layout (default after `/design`) |
-| `/build` | Implement tasks; supports `--all` for parallel dispatch |
+| `/build` | Implement tasks; supports `--all` (parallel) and `--bg` (background session, monitor via `claude agents`) |
 | `/test` | L1–L3 via tester, L4 via qa-reviewer |
-| `/polish` | Open an iteration loop between `/test` and `/deploy` |
+| `/polish` | Open an iteration loop between `/test` and `/deploy`; `--overnight` runs build→test→close unattended via native `/loop` |
 | `/deploy` | Production deploy via `deploy_target` from REQUIREMENTS.md |
 | `/finish` | Generate completion report and archive |
 | `/status` | Where you are now |
@@ -218,6 +218,22 @@ Platform B  → /resume
 ```
 
 If MemPalace or Graphify is unavailable, the kit falls back to filesystem and grep — slower, but `/resume` still works.
+
+---
+
+## Monitoring Parallel Work — Agent View (v2.2.0+)
+
+When you dispatch background sessions via `/build --bg` or `/polish --overnight`, Claude Code's native agent view shows live state.
+
+```
+claude agents
+```
+
+Each row shows: agent name, current activity, elapsed time, state (working / needs input / completed / failed). Press `Space` to peek, `Enter` to attach, `Esc` to leave.
+
+Kit-side reconciliation: on the next `/build` after a background dispatch, the orchestrator parses `claude agents` output and reconciles completed sessions against `STATE.background_sessions[]`. PLAN.md task statuses update without manual intervention.
+
+Note: inline `Task()` spawns (the default `/build` mode) do **not** appear in agent view — only `--bg` dispatches are persistent enough to surface. Use `--bg` when you want the live row; default inline for tasks under 30 minutes.
 
 ---
 

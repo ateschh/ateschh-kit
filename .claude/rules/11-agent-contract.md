@@ -19,6 +19,8 @@ Not every task warrants a subagent. Spawn overhead is real (prompt + output toke
 
 `task.size`, `files_touched`, and dependencies come from `PLAN.md` per `templates/project/PLAN.template.md`.
 
+**Effort level (v2.2.0+):** PLAN tasks may declare an optional `effort: low | med | high | xhigh` field. The orchestrator passes it as `effort:` in the `Task()` prompt. Default `high`. `xhigh` requires Opus 4.7. Coder honours the directive (longer thinking budget, more careful verification).
+
 ## 2. Output Contract
 
 Every spawned agent returns:

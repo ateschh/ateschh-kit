@@ -6,6 +6,24 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.2.0] — 2026-05-14
+
+**Minor release — Workflow integration with Claude Code native agent view, /loop, and effort levels.**
+
+### Added
+- **`/build --bg` mode** — dispatches coder as a Claude Code background session (`claude --bg --agent coder`). Orchestrator main session is not blocked. Monitor with `claude agents`. Reconciliation on next `/build` reads `STATE.background_sessions[]` against agent view output and updates PLAN.md task statuses.
+- **`/polish --overnight` mode** — wraps polish iteration loop in native `/loop`. Build → test → close runs unattended across model-self-paced wakeups. Honors hard ceiling.
+- **PLAN.md task `effort: low | med | high | xhigh` field** (optional). Default `high`. `xhigh` requires Opus 4.7. Orchestrator passes the value to `Task()` prompts.
+- **STATE.md `background_sessions: []` array** tracks dispatched `--bg` session IDs.
+- **README.md** new section: "Monitoring Parallel Work — Agent View (v2.2.0+)".
+- **Rule 10 hard ceiling** at `iteration_count` ≥ 10 — orchestrator refuses `/polish` past this point without explicit STATE.md edit + DECISIONS.md justification.
+- **Rule 11** documents the `effort:` field passthrough.
+
+### Changed
+- `/build` Mode list now includes `--bg` flag.
+- `/polish` Mode list now includes `--overnight` flag.
+- STATE.md template `kit_version: 2.2.0` (was 2.0.0; updated for new field).
+
 ## [2.1.0] — 2026-05-14
 
 **Minor release — Claude Code v2.1.139+ primitive integration.**

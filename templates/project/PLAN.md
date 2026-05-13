@@ -27,6 +27,8 @@ Every task has these fields. Missing fields fail the validator and break paralle
   files_touched:                  # best-effort path list; orchestrator uses for parallel safety
     - <relative path>
   status: pending | in-progress | done | failed | skipped
+  effort: low | med | high | xhigh  # optional (v2.2.0+). default: high.
+                                     # xhigh requires Opus 4.7. orchestrator passes to coder.
   notes: <optional, caveman>      # populated as work progresses
 ```
 

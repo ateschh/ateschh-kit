@@ -1,5 +1,5 @@
 ---
-kit_version: 2.0.0
+kit_version: 2.2.0
 project: {project-name}
 type: standalone
 phase: brainstorm
@@ -9,6 +9,7 @@ last_session_id: null
 interrupted: false
 current_wave: 0
 running_agents: []
+background_sessions: []
 parallel_concurrency: 3
 last_updated: {YYYY-MM-DD}
 started: {YYYY-MM-DD}
