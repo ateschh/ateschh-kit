@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# ATESCHH KIT pre-commit hook (template).
+#
+# Auto-runs sync-commands.ps1 and sync-skills.ps1 when staged changes touch
+# .claude/commands/ or .claude/skills/. Re-stages the resulting mirror diffs
+# in .agent/workflows/ and .opencode/commands/ so commits never split kit
+# canonical files from their mirrors.
+#
+# To install:
+#   cp templates/git-hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# To bypass for a single commit:
+#   git commit --no-verify
+
+set -e
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
+if [ -z "$repo_root" ]; then
+    exit 0
+fi
+
+staged=$(git diff --cached --name-only)
+
+run_sync_commands=false
+run_sync_skills=false
+
+if echo "$staged" | grep -q "^\.claude/commands/"; then
+    run_sync_commands=true
+fi
+
+if echo "$staged" | grep -q "^\.claude/skills/"; then
+    run_sync_skills=true
+fi
+
+if [ "$run_sync_commands" = false ] && [ "$run_sync_skills" = false ]; then
+    exit 0
+fi
+
+echo "[pre-commit] kit sync triggered"
+
+if [ "$run_sync_commands" = true ] && [ -f "$repo_root/scripts/sync-commands.ps1" ]; then
+    echo "[pre-commit] sync-commands.ps1"
+    pwsh -File "$repo_root/scripts/sync-commands.ps1" || {
+        echo "[pre-commit] sync-commands failed; commit aborted" >&2
+        exit 1
+    }
+    git add "$repo_root/.agent/workflows/" "$repo_root/.opencode/commands/" 2>/dev/null || true
+fi
+
+if [ "$run_sync_skills" = true ] && [ -f "$repo_root/scripts/sync-skills.ps1" ]; then
+    echo "[pre-commit] sync-skills.ps1"
+    pwsh -File "$repo_root/scripts/sync-skills.ps1" || {
+        echo "[pre-commit] sync-skills failed; commit aborted" >&2
+        exit 1
+    }
+    git add "$repo_root/.agent/skills/" "$repo_root/.opencode/skills/" 2>/dev/null || true
+fi
+
+exit 0

@@ -169,7 +169,58 @@ if ((Test-Path $pkgPath) -and (Test-Path $changelogPath)) {
     }
 }
 
-# 10. Report.
+# 10. Sync drift — hash .claude/commands/ against mirrors.
+$cmdSrcDir = Join-Path $root ".claude\commands"
+if (Test-Path $cmdSrcDir) {
+    $mirrors = @{
+        ".agent/workflows"     = Join-Path $root ".agent\workflows"
+        ".opencode/commands"   = Join-Path $root ".opencode\commands"
+    }
+    foreach ($srcFile in Get-ChildItem -Path $cmdSrcDir -Filter "*.md" -File) {
+        $srcHash = (Get-FileHash -Path $srcFile.FullName -Algorithm SHA256).Hash
+        foreach ($mirrorKey in $mirrors.Keys) {
+            $mirrorPath = Join-Path $mirrors[$mirrorKey] $srcFile.Name
+            if (-not (Test-Path $mirrorPath)) {
+                Add-Failure "WARN: $mirrorKey/$($srcFile.Name) missing (sync drift)"
+                continue
+            }
+            $mirrorHash = (Get-FileHash -Path $mirrorPath -Algorithm SHA256).Hash
+            if ($srcHash -ne $mirrorHash) {
+                Add-Failure "WARN: $mirrorKey/$($srcFile.Name) diverged from .claude/commands/ (sync drift)"
+            }
+        }
+    }
+}
+
+# 11. Caveman markers — heuristic check on STATE.md and SESSION-LOG.md.
+# Warn when article density > 5% (over-verbose for machine-read artefacts).
+$cavemanTargets = @()
+$projectsRoot = Join-Path $root "projects"
+if (Test-Path $projectsRoot) {
+    Get-ChildItem -Path $projectsRoot -Directory | ForEach-Object {
+        foreach ($f in @("STATE.md", "SESSION-LOG.md")) {
+            $p = Join-Path $_.FullName $f
+            if (Test-Path $p) { $cavemanTargets += $p }
+        }
+    }
+}
+foreach ($t in $cavemanTargets) {
+    $content = Get-Content -Raw $t -ErrorAction SilentlyContinue
+    if (-not $content -or $content.Length -lt 500) { continue }
+    # Strip code blocks and yaml frontmatter (preserve normal-English zones)
+    $body = $content -replace '(?s)```.*?```', '' -replace '(?s)^---.*?---', ''
+    $words = ($body -split '\s+').Where({ $_ })
+    if ($words.Count -lt 100) { continue }
+    $articleCount = ($body | Select-String -Pattern '\b(the|a|an)\b' -AllMatches).Matches.Count
+    $density = $articleCount / $words.Count
+    if ($density -gt 0.05) {
+        $pct = [math]::Round($density * 100, 1)
+        $rel = $t.Substring($root.Path.Length + 1)
+        Add-Failure "WARN: $rel article density $pct% (>5% — likely not caveman; Rule 12)"
+    }
+}
+
+# 12. Report.
 if ($failures.Count -eq 0) {
     Write-Host "validate: ok" -ForegroundColor Green
     exit 0

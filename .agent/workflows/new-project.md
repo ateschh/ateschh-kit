@@ -29,7 +29,7 @@ Single message:
 ### 3. Scaffold
 
 Copy from `templates/project/`:
-- `REQUIREMENTS.md`, `DESIGN.md`, `STRUCTURE.md`, `STATE.md`, `PLAN.md`, `DECISIONS.md` → `projects/{name}/`
+- `REQUIREMENTS.md`, `DESIGN.md`, `STRUCTURE.md`, `STATE.md`, `PLAN.md`, `DECISIONS.md`, `.gitignore` → `projects/{name}/`
 - Create empty: `projects/{name}/BACKLOG.md`, `projects/{name}/sessions/`, `projects/{name}/src/`
 - Create empty: `projects/{name}/.context7-cache/` (populated by `/requirements`)
 - Create empty: `projects/{name}/.wip/` (used by `/build` and `/polish` per Rule 09)

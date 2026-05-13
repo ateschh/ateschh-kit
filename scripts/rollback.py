@@ -49,6 +49,15 @@ def rollback_migrate(project: Path) -> int:
     for child in latest.iterdir():
         shutil.copy2(child, project / child.name) if child.is_file() else shutil.copytree(child, project / child.name)
 
+    # v2.3.0+: also restore .mempalace/ if it was captured in the backup.
+    backup_palace = latest / ".mempalace"
+    target_palace = project / ".mempalace"
+    if backup_palace.is_dir():
+        if target_palace.exists():
+            shutil.rmtree(target_palace)
+        shutil.copytree(backup_palace, target_palace)
+        print(f"[rollback] restored .mempalace/ from {latest.name}")
+
     print(f"[rollback] restored from {latest.name}; discarded current state at {discarded.name}")
     return 0
 

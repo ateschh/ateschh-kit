@@ -4,7 +4,7 @@ description: Opens a polish iteration between /test (passing) and /deploy. Plans
 phase: polish
 agents: [architect, wireframer, coder, context-manager]
 skills: [architecture-design, write-code]
-flags: [--cancel, --size <S|M|L>]
+flags: [--cancel, --size <S|M|L>, --overnight]
 outputs: [polish/iteration-{N}/PLAN.md, polish/iteration-{N}/CHANGES.md, STATE.md updated]
 ---
 
@@ -32,6 +32,7 @@ Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
 `/polish`              → start a new iteration (interactive planning).
 `/polish --cancel`     → cancel current iteration (must be in `polish-N` phase).
 `/polish --size L`     → start a new iteration with declared size override.
+`/polish --overnight`  → wrap iteration loop in native Claude Code `/loop` so build→test→close runs unattended. Stops at iteration hard cap (10 per Rule 10) or on first `failed` status.
 
 ## Steps
 
@@ -147,6 +148,24 @@ When test passes → close iteration (step 8).
   polish-{N} done. {tasks count} tasks. {unlocks count} unlocks. ready deploy.
   ```
 - Append SESSION-LOG.md (caveman).
+
+### 8b. Overnight mode (`--overnight` flag, v2.2.0+)
+
+When `--overnight` is set:
+
+1. After step 6 approval gate, instead of inline build/test loop:
+2. Orchestrator invokes native Claude Code `/loop`:
+   ```
+   /loop polish-iterate
+   ```
+   where `polish-iterate` is a sub-routine that runs `/build` → `/test` → close-iteration for the current iteration, then exits the loop. `/loop` re-fires on a model-self-paced schedule.
+3. On each loop iteration:
+   - If `STATE.iteration_count` ≥ **10** (hard cap, per Rule 10) → stop the loop, surface "hard cap reached" notice.
+   - If any task `status: failed` and `--continue-on-fail` not set → stop the loop, preserve `.wip/`, escalate.
+   - Otherwise continue.
+4. User can stop the loop at any time with `claude` Esc or `/loop --cancel`.
+
+`--overnight` is best for the polish-loop user who wants unattended iteration across a long session window. Default remains interactive.
 
 ### 9. Cancel mode
 

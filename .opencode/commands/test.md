@@ -24,6 +24,7 @@ Workspace app: `{path} = projects/{workspace-name}/apps/{app}/`
 `/test --scope last-task`     → L1–L2 only on the most recently changed code
 `/test --scope regression`    → re-run L1–L3 to confirm fixes
 `/test --skip-l4`             → run L1–L3 only; do not advance to deploy-ready
+`/test --ultrareview`         → use cloud multi-agent `claude ultrareview <target>` for L4 instead of local `qa-reviewer`. Requires Claude Code subscription with ultrareview entitlement. Falls back to local qa-reviewer if unavailable.
 
 ## Steps
 
@@ -53,9 +54,11 @@ For each defect, severity-ordered (critical → high → medium → low):
 
 After all defects processed, re-spawn `tester` with `scope: regression` to confirm the fix set holds.
 
-### 3. Spawn qa-reviewer for L4
+### 3. L4 review — local qa-reviewer or cloud ultrareview
 
-Once L1–L3 are clean:
+Once L1–L3 are clean. Two paths:
+
+**Default — local `qa-reviewer`:**
 `Task(subagent_type: "qa-reviewer", ...)`. Caveman task body:
 
 ```
@@ -66,7 +69,16 @@ build path: {production build dir or preview url}
 design refs: DESIGN.md, design-system/MASTER.md, WIREFRAMES.md
 ```
 
-Skip this step if `--skip-l4` flag is set.
+**`--ultrareview` (v2.3.0+) — cloud parallel multi-agent:**
+Invoke Claude Code's native ultrareview primitive:
+```
+claude ultrareview {target} --bg
+```
+where `{target}` is the production build path or current branch. The cloud run dispatches multiple parallel reviewers (perf, a11y, security, UX) in isolated worktrees. Orchestrator polls `claude agents` for the resulting session ID. Defect list returned in the session's final output.
+
+Fallback: if `claude ultrareview` exits non-zero (not entitled / not reachable), the orchestrator transparently falls back to local `qa-reviewer` and logs the fallback to SESSION-LOG.
+
+Skip this step entirely if `--skip-l4` flag is set.
 
 ### 4. Handle L4 defects
 

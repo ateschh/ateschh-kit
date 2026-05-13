@@ -203,6 +203,81 @@ def stamp_version(ctx: MigrationContext) -> None:
         ctx.log(f".kit-version stamped {ctx.to_version}")
 
 
+def init_mempalace_wing(ctx: MigrationContext) -> None:
+    """Initialize per-project MemPalace wing under projects/<name>/.mempalace/.
+
+    Best-effort: skip silently if mempalace CLI is not on PATH.
+    Idempotent: skip if .mempalace/ already exists with content.
+    """
+    palace_dir = ctx.project_path / ".mempalace"
+    if palace_dir.exists() and any(palace_dir.iterdir()):
+        ctx.log(".mempalace/ already initialized; skipping")
+        return
+
+    mempalace_bin = shutil.which("mempalace")
+    if not mempalace_bin:
+        ctx.log("mempalace CLI not on PATH; skipping per-project wing init")
+        return
+
+    if ctx.dry_run:
+        ctx.log(f"would init mempalace wing at {palace_dir.relative_to(ctx.project_path)}")
+        return
+
+    palace_dir.mkdir(exist_ok=True)
+    try:
+        import subprocess  # local import — only this function needs it
+        subprocess.run(
+            [mempalace_bin, "init", "--palace", str(palace_dir)],
+            check=True,
+            capture_output=True,
+            timeout=30,
+        )
+        ctx.log(f"mempalace wing initialized at {palace_dir.relative_to(ctx.project_path)}")
+
+        sessions_dir = ctx.project_path / "sessions"
+        if sessions_dir.exists() and any(sessions_dir.glob("*.md")):
+            result = subprocess.run(
+                [mempalace_bin, "mine", str(sessions_dir), "--palace", str(palace_dir)],
+                check=False,
+                capture_output=True,
+                timeout=120,
+            )
+            if result.returncode == 0:
+                ctx.log("sessions mined into per-project palace")
+            else:
+                ctx.log(f"mempalace mine returned {result.returncode}; sessions kept in default palace")
+    except Exception as exc:
+        ctx.log(f"mempalace wing init failed: {exc} (palace dir preserved)")
+
+
+def seed_context7_cache(ctx: MigrationContext) -> None:
+    """Pre-create .context7-cache/ structure; do not populate.
+
+    Population happens on /requirements re-lock or first /build that touches a
+    library. We only ensure the directory exists with a README pointer.
+    """
+    cache_dir = ctx.project_path / ".context7-cache"
+    if cache_dir.exists() and any(cache_dir.iterdir()):
+        ctx.log(".context7-cache/ already populated; skipping seed")
+        return
+
+    if ctx.dry_run:
+        ctx.log(f"would seed {cache_dir.relative_to(ctx.project_path)}")
+        return
+
+    cache_dir.mkdir(exist_ok=True)
+    readme = cache_dir / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            "# Context7 Cache\n\n"
+            "Per-library API summaries written by `requirements-expert` at lock time.\n"
+            "Each subdir: `<lib>@<ver>/api-summary.md`.\n"
+            "Run `/requirements` to re-seed if libraries change.\n",
+            encoding="utf-8",
+        )
+        ctx.log(f"seeded {cache_dir.relative_to(ctx.project_path)}/README.md")
+
+
 def sync_active_project_md(ctx: MigrationContext) -> None:
     """Update .state/ACTIVE-PROJECT.md Phase line to STATE.phase enum (v2 format).
 
@@ -440,6 +515,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         transform_memory_md(ctx)
         cleanup_stale_artifacts(ctx)
         stamp_version(ctx)
+        init_mempalace_wing(ctx)
+        seed_context7_cache(ctx)
         sync_active_project_md(ctx)
     except Exception as exc:
         print(f"[migrate] transformer failed: {exc}", file=sys.stderr)

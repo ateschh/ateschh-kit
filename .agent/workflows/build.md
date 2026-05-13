@@ -33,12 +33,24 @@ Active PLAN file:
 `/build --task T-014`        → specific task
 `/build --all` / `--batch`   → every remaining pending task, parallel dispatch per Rule 11
 `/build --continue-on-fail`  → applies only with `--all`; failed tasks marked, others continue
+`/build --bg`                → dispatch coder as background session (`claude --bg --agent coder ...`). Orchestrator main session is not blocked; monitor with `claude agents`. Combine with `--task` or `--all`.
 
 ## Steps
 
 ### 1. Wireframe gate
 
 Read `STATE.wireframe_status`. If `pending` → exit with guidance. Else continue.
+
+### 1b. Graphify auto-init (first /build only)
+
+Check `{path}/graphify-out/graph.json`. If absent AND any code files exist under `{path}` (`*.ts`, `*.tsx`, `*.py`, `*.js`, `*.jsx`, `*.go`, `*.rs`, `*.java`, `*.swift`, `*.kt`):
+
+1. If `{path}/.git/` absent → run `git init && git add . && git commit -m "init: pre-build baseline"` inside `{path}`.
+2. Run `graphify update {path}`.
+3. Run `graphify hook install` (cwd = `{path}`).
+4. Append SESSION-LOG: `graphify init. nodes/edges/communities recorded.`
+
+Skip silently if graph already exists. User does not need to remember — first `/build` bootstraps.
 
 ### 2. Pick task(s)
 
@@ -77,9 +89,29 @@ Before each `Task()` call, collect minimal context:
 
 Per Rule 11:
 - Default concurrency: `STATE.parallel_concurrency` (default 3).
-- Wave assembly: pick up to `concurrency` leaves whose `files_touched` sets are pairwise disjoint.
+- Wave assembly: pick up to `concurrency` leaves whose `files_touched` sets are pairwise disjoint (worktree-isolated agents exempt per Rule 11 §4).
 - Update `STATE.current_wave++`, `STATE.running_agents` with `[{name, task_id}]` entries.
 - Spawn the wave in a single message containing N `Task()` tool uses.
+
+### 5b. Background dispatch (`--bg` mode, v2.2.0+)
+
+When `--bg` flag is set, instead of inline `Task()`:
+
+1. For each picked task, run:
+   ```
+   claude --bg --agent coder --permission-mode default <task-prompt>
+   ```
+2. Capture each background session ID from stdout (`backgrounded · <id>`).
+3. Append IDs to `STATE.background_sessions[]`.
+4. Print user-facing summary:
+   ```
+   Dispatched N background coder sessions. Monitor with `claude agents`.
+   IDs: <id1>, <id2>, ...
+   ```
+5. Exit. **Orchestrator does not wait.** User reattaches via `claude attach <id>` or `claude agents`.
+6. On next `/build` (any mode), orchestrator reconciles `STATE.background_sessions[]` against `claude agents` output: completed sessions update PLAN.md task status; still-running sessions are surfaced.
+
+`--bg` is opt-in and best for L-size tasks (>2h) or when the user wants to free the main conversation. Default remains inline `Task()`.
 
 ### 6. Coder Task() prompt (caveman task body)
 

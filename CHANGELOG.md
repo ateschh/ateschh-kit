@@ -6,6 +6,28 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.3.0] — 2026-05-14
+
+**Minor release — Ops + quality (Phase D of v2.1 refactor). Closes audit gaps and automates publishing.**
+
+### Added
+- **GitHub Actions CI/CD** (`.github/workflows/publish.yml`) — pushing a `v*.*.*` tag triggers auto-publish to npm + GitHub release with CHANGELOG section as notes. Uses `NPM_TOKEN` repo secret (2FA-bypass automation token). Manual `npm publish --otp` only needed for breaking changes.
+- **`/test --ultrareview` flag** — optional cloud parallel multi-agent L4 review via `claude ultrareview <target>`. Falls back to local `qa-reviewer` if not entitled.
+- **PostToolUse caveman hook** (`.claude/hooks/post-tool-caveman.ps1`) — light caveman compression on Bash/Read/Grep/Glob output when `caveman_mode = full | ultra`. Preserves code blocks, paths, error quotes. Only emits when ≥10% savings.
+- **Stop hook — token zone monitor** (`.claude/hooks/stop-token-zone.ps1`) — writes `.state/TOKEN-ZONE-MARKER.txt` at 70% (POOR) / 90% (CRITICAL) context usage. Surfaces yellow notice. With `auto_save_at_70: true` in settings, orchestrator auto-runs `/save` next turn.
+- **Per-project MemPalace wing** — `migrate.py init_mempalace_wing()` creates `projects/<name>/.mempalace/` and mines sessions there. Eliminates cross-project leakage. `rollback.py` now also restores `.mempalace/` from backup.
+- **`.context7-cache/` seed during migrate** — `migrate.py seed_context7_cache()` ensures the cache directory exists with a README pointer.
+- **`templates/git-hooks/pre-commit`** — opt-in pre-commit hook auto-runs `sync-commands.ps1` and `sync-skills.ps1` when staged changes touch `.claude/commands/` or `.claude/skills/`, then re-stages mirror diffs.
+- **Validator checks 10–11** — sync drift (SHA256 compare of `.claude/commands/` vs `.agent/workflows/` + `.opencode/commands/`) and caveman density heuristic on STATE.md / SESSION-LOG.md.
+
+### Changed
+- **`settings.local.json`** now wires three hooks (`PreCompact`, `PostToolUse`, `Stop`) and bumps `ateschh_kit.kit_version` to `2.3.0`. New flag `auto_save_at_70: false` (advisory by default).
+
+### Migration notes
+- Existing v2.2.x projects: `npx ateschh-kit@latest --update`. Hooks become active after the new `settings.local.json` is written.
+- CI/CD requires `NPM_TOKEN` repo secret (one-time setup).
+- Per-project MemPalace wing populates on next `/migrate` re-run; existing flat-room data preserved.
+
 ## [2.2.0] — 2026-05-14
 
 **Minor release — Workflow integration with Claude Code native agent view, /loop, and effort levels.**

@@ -30,3 +30,11 @@ On `/resume` these load first, restoring full context in a fresh window.
 The hook does NOT block compaction (exits 0) — Claude Code's own compaction is generally lossless. The marker is a safety net for projects where the orchestrator should hard-checkpoint before the compaction window closes.
 
 To disable: remove the `PreCompact` entry from `settings.local.json` `hooks` block.
+
+## Token Zone Auto-Trigger (v2.3.0+)
+
+`.claude/hooks/stop-token-zone.ps1` fires after every Stop event. It computes `tokens_used / context_window` from the hook payload. When the ratio crosses 70%, it writes `.state/TOKEN-ZONE-MARKER.txt` with the zone (`POOR` at 70–90%, `CRITICAL` at 90%+) and surfaces a yellow notice in the transcript.
+
+When the marker is present and `ateschh_kit.auto_save_at_70` is `true` in `settings.local.json`, the orchestrator automatically runs `/save` at the start of the next turn instead of just suggesting it.
+
+Disable by removing the Stop entry from `settings.local.json` `hooks`, or by setting `auto_save_at_70: false` (default) for advisory-only behaviour.
