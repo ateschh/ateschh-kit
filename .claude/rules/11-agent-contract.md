@@ -100,7 +100,15 @@ loop:
 
 ### File-conflict detection
 
-Before assembling a wave, the orchestrator computes `files_touched` for every leaf. Tasks whose sets intersect cannot be in the same wave. They are queued for sequential execution after the wave completes.
+**v2.1.0 update:** Code-writing agents (`coder`, `debugger`, `qa-reviewer`) declare `isolation: worktree` in frontmatter. Each spawn runs in its own `.claude/worktrees/<agent>-<id>/`. File writes never collide at the filesystem level, even when `files_touched` sets overlap.
+
+This means: **wave packing can be more aggressive**. The orchestrator MAY include leaves with overlapping `files_touched` in the same wave when both agents declare `isolation: worktree`. Sequencing is still preferred when:
+- Tasks have logical dependencies (one depends on the other's output).
+- The work needs to read the other's in-flight changes mid-stream.
+
+For agents WITHOUT worktree isolation (read-only agents like `tester`, `architect`, etc.), the original pre-wave overlap check still applies.
+
+Before assembling a wave, the orchestrator computes `files_touched` for every leaf. Worktree-isolated agents are exempt from intra-wave overlap checks. Non-isolated agents whose sets intersect cannot be in the same wave; they queue for sequential execution.
 
 ### Workspace-mode parallel dispatch
 

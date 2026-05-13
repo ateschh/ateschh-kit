@@ -72,6 +72,37 @@ Why:
 
 ---
 
+## Native Claude Code Primitives (v2.1.139+)
+
+Kit v2.1.0 wires native Claude Code primitives where they map onto kit semantics:
+
+| Primitive | Kit usage |
+|-----------|-----------|
+| `Task()` subagent spawn | Existing — every agent reachable via `Task(subagent_type: ...)` |
+| `isolation: worktree` in agent frontmatter | `coder`, `debugger`, `qa-reviewer` auto-isolate file writes under `.claude/worktrees/<agent>-<id>/`. `/build --all` parallel waves no longer require pre-wave file-touch overlap check (Rule 11 §4 supersedes) |
+| `mcpServers:` in agent frontmatter | Per-agent MCP loading. `context-manager` → `[graphify, mempalace]`, `requirements-expert` → `[context7]`, `coder`/`debugger` → `[graphify]`. Tool-search overhead drops; MCPs connect lazily |
+| `alwaysLoad` MCP option | `graphify` and `mempalace` skip the v2.1.121 tool-search deferral — orchestrator can call them on the first turn without a `ToolSearch` round-trip |
+| `PreCompact` hook | `.claude/hooks/pre-compact.ps1` writes a `.state/PRE-COMPACT-MARKER.txt` so the next session knows to surface `/save` guidance |
+| `claude agents` / `--bg` background sessions | Reserved for v2.2.0 — `/build --bg` opt-in mode dispatches long L-size tasks as persistent background sessions |
+| `x-claude-code-agent-id` headers + env | Optional `agent_id` / `parent_agent_id` fields in OUTPUT-SCHEMA `custom:` block for telemetry |
+
+### Worktree isolation flow (`/build --all` example)
+
+```
+Wave-1 leaves: [T-014 (coder), T-022 (coder), T-025 (debugger)]
+  ↓ Task(subagent_type: coder, ...) — fires 3 calls in parallel
+Claude Code spawns each agent in its own worktree:
+  .claude/worktrees/coder-T-014/
+  .claude/worktrees/coder-T-022/
+  .claude/worktrees/debugger-T-025/
+  ↓ each agent reads, edits, runs L1+L2 in isolation
+On agent success → Claude Code merges worktree back to main checkout
+On agent failure → worktree preserved at .claude/worktrees/<agent>-<id>/
+                    for inspection. Rule 09 WIP rollback applies.
+```
+
+---
+
 ## Behavioural Rules (`.claude/rules/`)
 
 | File | Topic |

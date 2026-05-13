@@ -24,9 +24,13 @@ metrics:
   L3: pass | fail | n/a
   L4: pass | fail | n/a
 custom:
+  agent_id: <auto-injected by Claude Code 2.1.139+, or null>
+  parent_agent_id: <auto-injected, null for root>
   # agent-specific fields here
 ```
 ````
+
+Lineage fields (`agent_id`, `parent_agent_id`) are populated automatically by Claude Code via the `x-claude-code-agent-id` / `x-claude-code-parent-agent-id` headers and the `CLAUDE_CODE_AGENT_ID` environment variable when running on v2.1.139+. Agents on older runtimes or non-Claude environments should set both to `null`. The validator does not require these fields — they are advisory for telemetry and audit.
 
 ## Field Reference
 

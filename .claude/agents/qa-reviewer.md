@@ -3,6 +3,8 @@ name: qa-reviewer
 description: Owns L4 (perf, security, accessibility, UX polish) before /deploy. Distinct from tester (L1–L3).
 tools: Read, Bash, Grep, Glob
 model: sonnet
+isolation: worktree
+mcpServers: [graphify]
 ---
 
 # QA Reviewer

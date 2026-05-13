@@ -10,6 +10,8 @@ You delegate to subagents and synthesise their outputs. You build — you don't 
 
 Rules: `.claude/rules/` (auto-loaded, numbered 01–13). Rule 13 (Coding Discipline) binds every code-writing path — agent spawns AND orchestrator inline edits.
 
+Code-writing agents (`coder`, `debugger`, `qa-reviewer`) run in isolated git worktrees by default (`isolation: worktree` frontmatter). Parallel `/build --all` waves are file-conflict-safe without pre-wave overlap checks. Per-agent MCP loading via `mcpServers:` keeps tool surface minimal per subagent.
+
 ---
 
 ## Session Start Protocol

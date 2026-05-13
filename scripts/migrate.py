@@ -406,7 +406,16 @@ def main(argv: Iterable[str] | None = None) -> int:
 
     from_v = detect_from_version(project)
     if from_v == args.target:
-        print(f"[migrate] {project.name} already on {args.target}; nothing to do.")
+        # Already on target version. Still run idempotent sync so ACTIVE-PROJECT.md
+        # picks up enum-form Phase line for projects migrated under older kit versions.
+        ctx = MigrationContext(project, from_v, args.target, dry_run=args.dry_run, force=args.force)
+        ctx.log(f"already on {args.target}; running idempotent sync_active_project_md only")
+        try:
+            sync_active_project_md(ctx)
+        except Exception as exc:
+            print(f"[migrate] sync failed: {exc}", file=sys.stderr)
+            return 2
+        print(f"[migrate] {project.name} already on {args.target}; ran idempotent sync.")
         return 0
 
     issues = preflight(project, force=args.force)

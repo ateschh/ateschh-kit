@@ -3,6 +3,7 @@ name: requirements-expert
 description: Selects and locks the optimal tech stack. Verifies versions via Context7. Outputs and locks REQUIREMENTS.md including the deploy_target field.
 tools: Read, Write, Grep
 model: sonnet
+mcpServers: [context7]
 ---
 
 # Requirements Expert

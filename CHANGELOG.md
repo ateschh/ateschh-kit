@@ -6,6 +6,29 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.1.0] — 2026-05-14
+
+**Minor release — Claude Code v2.1.139+ primitive integration.**
+
+### Added
+- **Subagent `isolation: worktree` frontmatter** on `coder`, `debugger`, `qa-reviewer`. Each spawn auto-isolates under `.claude/worktrees/<agent>-<id>/`. Parallel `/build --all` waves are file-conflict-safe without pre-wave overlap checks. Rule 11 §4 updated.
+- **Subagent `mcpServers:` frontmatter** for per-agent MCP loading:
+  - `context-manager` → `[graphify, mempalace]`
+  - `requirements-expert` → `[context7]`
+  - `coder`, `debugger`, `qa-reviewer` → `[graphify]`
+- **`alwaysLoad` MCP option** in `settings.local.json` for `graphify` and `mempalace`. Skips v2.1.121 tool-search deferral; orchestrator calls these on first turn without round-trip.
+- **PreCompact hook** — `.claude/hooks/pre-compact.ps1` (and `.sh` mirror). Writes `.state/PRE-COMPACT-MARKER.txt` so the next session surfaces `/save` guidance. Configured via `hooks.PreCompact` in `settings.local.json`.
+- **OUTPUT-SCHEMA agent lineage fields** — `agent_id` and `parent_agent_id` in `custom:` block. Auto-populated by Claude Code 2.1.139+ via `x-claude-code-agent-id` headers. Advisory; validator does not require.
+- **ARCHITECTURE.md** new section: "Native Claude Code Primitives (v2.1.139+)" with table + worktree isolation flow diagram.
+- **CLAUDE.md / AGENTS.md** note clarifying code-writing agents run in isolated worktrees by default.
+- **Rule 07** documents PreCompact hook behaviour.
+
+### Changed
+- Rule 11 §4 "File-conflict detection" — worktree-isolated agents exempt from intra-wave overlap checks. Wave packing more aggressive.
+
+### Fixed
+- `migrate.py` early-return path now runs `sync_active_project_md()` so projects already on the same kit version still get ACTIVE-PROJECT.md enum sync. Idempotent.
+
 ## [2.0.3] — 2026-05-14
 
 ### Added

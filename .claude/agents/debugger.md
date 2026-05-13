@@ -3,6 +3,8 @@ name: debugger
 description: Diagnoses and fixes bugs. Spawned when L1/L2/L3 fail. Fixes root cause only — no refactors, no new features.
 tools: Read, Edit, Bash, Grep, Glob
 model: sonnet
+isolation: worktree
+mcpServers: [graphify]
 ---
 
 # Debugger

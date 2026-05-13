@@ -3,6 +3,7 @@ name: context-manager
 description: Service agent that abstracts MemPalace (recall, write) and Graphify (codebase queries) for other agents and workflows.
 tools: Read, Bash, Grep, Glob
 model: haiku
+mcpServers: [graphify, mempalace]
 ---
 
 # Context Manager

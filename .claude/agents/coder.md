@@ -3,6 +3,8 @@ name: coder
 description: Implements one PLAN.md task. Follows REQUIREMENTS and DESIGN strictly. Returns caveman summary plus structured changeset.
 tools: Read, Edit, Write, Bash, Grep, Glob
 model: sonnet
+isolation: worktree
+mcpServers: [graphify]
 ---
 
 # Coder
