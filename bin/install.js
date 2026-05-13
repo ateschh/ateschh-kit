@@ -336,8 +336,9 @@ function installCaveman() {
 }
 
 function ensureMcpRegistration(targetDir) {
-  // Make sure .claude/settings.local.json declares MCP servers we expect.
-  // We are conservative: only ADD entries that aren't already present.
+  // Make sure .claude/settings.local.json declares MCP servers, hooks, and
+  // ateschh_kit defaults we expect. Conservative: only ADD missing entries,
+  // never overwrite user customisations.
   const settingsPath = path.join(targetDir, '.claude', 'settings.local.json')
   if (!fs.existsSync(settingsPath)) return { ok: false, detail: 'settings.local.json missing' }
 
@@ -348,14 +349,44 @@ function ensureMcpRegistration(targetDir) {
     return { ok: false, detail: `settings.local.json invalid JSON: ${e.message}` }
   }
 
+  // MCP allowlist + alwaysLoad
   raw.mcp = raw.mcp || {}
   raw.mcp.allowlist = raw.mcp.allowlist || []
   for (const name of ['context7', 'graphify', 'mempalace']) {
     if (!raw.mcp.allowlist.includes(name)) raw.mcp.allowlist.push(name)
   }
+  raw.mcp.alwaysLoad = raw.mcp.alwaysLoad || []
+  for (const name of ['graphify', 'mempalace']) {
+    if (!raw.mcp.alwaysLoad.includes(name)) raw.mcp.alwaysLoad.push(name)
+  }
+
+  // Hook entries — v2.1.0 PreCompact, v2.3.0 PostToolUse + Stop.
+  raw.hooks = raw.hooks || {}
+  const hookDefs = {
+    PreCompact: [{ matcher: '*', type: 'command', command: 'pwsh -ExecutionPolicy Bypass -File .claude/hooks/pre-compact.ps1' }],
+    PostToolUse: [{ matcher: 'Bash|Read|Grep|Glob', type: 'command', command: 'pwsh -ExecutionPolicy Bypass -File .claude/hooks/post-tool-caveman.ps1' }],
+    Stop: [{ matcher: '*', type: 'command', command: 'pwsh -ExecutionPolicy Bypass -File .claude/hooks/stop-token-zone.ps1' }],
+  }
+  for (const [hookName, defs] of Object.entries(hookDefs)) {
+    raw.hooks[hookName] = raw.hooks[hookName] || []
+    for (const def of defs) {
+      const already = raw.hooks[hookName].some(h => h.command === def.command)
+      if (!already) raw.hooks[hookName].push(def)
+    }
+  }
+
+  // ateschh_kit defaults
+  raw.ateschh_kit = raw.ateschh_kit || {}
+  const pkgPath = path.join(__dirname, '..', 'package.json')
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
+  raw.ateschh_kit.kit_version = pkg.version
+  if (raw.ateschh_kit.parallel_concurrency == null) raw.ateschh_kit.parallel_concurrency = 3
+  if (raw.ateschh_kit.caveman_mode == null) raw.ateschh_kit.caveman_mode = 'matrix-default'
+  if (raw.ateschh_kit.auto_run_doctor_on_resume == null) raw.ateschh_kit.auto_run_doctor_on_resume = true
+  if (raw.ateschh_kit.auto_save_at_70 == null) raw.ateschh_kit.auto_save_at_70 = false
 
   fs.writeFileSync(settingsPath, JSON.stringify(raw, null, 2) + '\n')
-  return { ok: true, detail: 'MCP allowlist updated' }
+  return { ok: true, detail: 'MCP + hooks + kit defaults synced' }
 }
 
 function autoInstallIntegrations(targetDir) {

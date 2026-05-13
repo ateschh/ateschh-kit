@@ -6,6 +6,11 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [2.3.1] — 2026-05-14
+
+### Fixed
+- **`bin/install.js` settings merger** — `ensureMcpRegistration()` now also additively merges `hooks.PreCompact / PostToolUse / Stop` entries, `mcp.alwaysLoad`, and `ateschh_kit` defaults (including `kit_version` bump to the published package version). Previously only `mcp.allowlist` was synced, leaving v2.1+ hooks and v2.3 token-zone monitor inactive after `npx ateschh-kit@latest --update` on existing projects. User customisations preserved (only missing entries added).
+
 ## [2.3.0] — 2026-05-14
 
 **Minor release — Ops + quality (Phase D of v2.1 refactor). Closes audit gaps and automates publishing.**
